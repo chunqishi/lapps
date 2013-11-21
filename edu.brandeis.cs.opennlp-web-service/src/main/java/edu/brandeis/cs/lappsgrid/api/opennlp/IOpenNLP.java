@@ -4,6 +4,9 @@ package edu.brandeis.cs.lappsgrid.api.opennlp;
 import org.lappsgrid.api.WebService;
 //import org.slf4j.Logger;
 //import org.slf4j.LoggerFactory;
+import org.lappsgrid.discriminator.Types;
+
+import edu.brandeis.cs.lappsgrid.opennlp.OpenNLPWebServiceException;
 
 /**
  * <i>IOpenNLP.java</i> Language Application Grids (<b>LAPPS</b>)
@@ -24,5 +27,98 @@ import org.lappsgrid.api.WebService;
  * 
  */
 public interface IOpenNLP extends WebService {
-//	   protected static final Logger logger = LoggerFactory.getLogger(OpenNLP.class);
+	public static final long [] TYPES_REQUIRES = new long[] { Types.OPENNLP, Types.TEXT };
+	public static final long [] TYPES_PRODUCES = new long[] { Types.OPENNLP, Types.SENTENCE };
+	public static final String FILE_PROPERTIES = "opennlp-web-service.properties";
+	
+	public static final String SPLITTER_LINE = "\n";
+	
+	/**
+	 * chunkerMET
+	 * @see opennlp.tools.cmdline.BasicCmdLineTool
+	 * @see opennlp.tools.cmdline.chunker.ChunkerConverterTool
+	 */
+	public String[] chunkerMET(String[] lines) throws OpenNLPWebServiceException;
+	
+	/**
+	 * 
+	 * @param lines: splitter mark is "\n" {@link SPLITTER_LINE} 
+	 * @return
+	 * @throws OpenNLPWebServiceException
+	 */
+	public String[] chunkerMET(String lineswithsplitter) throws OpenNLPWebServiceException;
+	
+	/**
+	 * Coreferencer
+	 * @see opennlp.tools.cmdline.BasicCmdLineTool
+	 * @see opennlp.tools.cmdline.coref.CoreferencerTool
+	 */
+	public String[] coreferencer(String[] lines) throws OpenNLPWebServiceException;
+	
+	public String[] coreferencer(String lineswithsplitter) throws OpenNLPWebServiceException;
+	
+	/**
+	 * DictionaryDetokenizer
+	 * @see opennlp.tools.cmdline.BasicCmdLineTool
+	 * @see opennlp.tools.cmdline.tokenizer.DictionaryDetokenizerTool
+	 */
+	public String[] dictionaryDetokenizer(String[] lines) throws OpenNLPWebServiceException;
+	
+	public String[] dictionaryDetokenizer(String lineswithsplitter) throws OpenNLPWebServiceException;
+	
+	/**
+	 * Doccat
+	 * @see opennlp.tools.cmdline.BasicCmdLineTool
+	 * @see opennlp.tools.cmdline.doccat.DoccatTool
+	 */
+	public String[] doccat(String[] lines) throws OpenNLPWebServiceException;
+	
+	public String[] doccat(String lineswithsplitter) throws OpenNLPWebServiceException;
+	
+	/**
+	 * Parser
+	 * @see opennlp.tools.cmdline.BasicCmdLineTool
+	 * @see opennlp.tools.cmdline.parser.ParserTool
+	 */
+	public String[] parser(String[] lines) throws OpenNLPWebServiceException;
+	
+	public String[] parser(String lineswithsplitter) throws OpenNLPWebServiceException;
+	
+	
+	/**
+	 * SentenceDetector
+	 * @see opennlp.tools.cmdline.BasicCmdLineTool
+	 * @see opennlp.tools.cmdline.sentdetect.SentenceDetectorTool
+	 */
+	public String[] sentenceDetector(String[] lines) throws OpenNLPWebServiceException;
+	
+	public String[] sentenceDetector(String lineswithsplitter) throws OpenNLPWebServiceException;
+	
+	
+	/**
+	 * SimpleTokenizer
+	 * @see opennlp.tools.cmdline.BasicCmdLineTool
+	 * @see opennlp.tools.cmdline.tokenizer.SimpleTokenizerTool
+	 */
+	public String[] simpleTokenizer(String[] lines) throws OpenNLPWebServiceException;
+	
+	public String[] simpleTokenizer(String lineswithsplitter) throws OpenNLPWebServiceException;
+	
+	/**
+	 * TokenizerME
+	 * @see opennlp.tools.cmdline.BasicCmdLineTool
+	 * @see opennlp.tools.cmdline.tokenizer.TokenizerMETool
+	 */
+	public String[] tokenizerME(String[] lines) throws OpenNLPWebServiceException;
+	
+	public String[] tokenizerME(String lineswithsplitter) throws OpenNLPWebServiceException;
+	
+	/**
+	 * TokenNameFinder
+	 * @see opennlp.tools.cmdline.BasicCmdLineTool
+	 * @see opennlp.tools.cmdline.namefind.TokenNameFinderTool
+	 */
+	public String[] tokenNameFinder(String[] lines) throws OpenNLPWebServiceException;
+	
+	public String[] tokenNameFinder(String lineswithsplitter) throws OpenNLPWebServiceException;
 }

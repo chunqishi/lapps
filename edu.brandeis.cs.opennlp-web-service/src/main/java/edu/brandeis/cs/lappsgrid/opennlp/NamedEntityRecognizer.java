@@ -134,13 +134,13 @@ public class NamedEntityRecognizer implements INamedEntityRecognizer {
 		return DataFactory.stringList(strSpans);
 	}
 
-	public static final Span fromStringToSpan(String s) {
+	protected static final Span fromStringToSpan(String s) {
 		String[] strArr = s.split(TOKEN_SPAN_SPLIT);
 		return new Span(Integer.parseInt(strArr[0]),
 				Integer.parseInt(strArr[1]), strArr[2]);
 	}
 
-	public static final String fromSpanToString(Span span) {
+	protected static final String fromSpanToString(Span span) {
 		return new String(span.getStart() + TOKEN_SPAN_SPLIT + span.getEnd()
 				+ TOKEN_SPAN_SPLIT + span.getType());
 	}
