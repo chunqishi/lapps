@@ -94,10 +94,12 @@ public class NamedEntityRecognizer implements INamedEntityRecognizer {
 		logger.info("init(): load opennlp-web-service.properties.");
 
 		for (String nerModel : nerModels.split(":")) {
-			logger.info("init(): load "+nerModel+" ...");
-			TokenNameFinder nameFinder = load(nerModel);
-			if (nameFinder != null) 
-				nameFinders.add(nameFinder);
+			logger.info("init(): load " + nerModel + " ...");
+			if (nerModel.trim().length() > 0) {
+				TokenNameFinder nameFinder = load(nerModel);
+				if (nameFinder != null)
+					nameFinders.add(nameFinder);
+			}
 		}
 
 		logger.info("init(): Creating OpenNLP NamedEntityRecognizer!");
