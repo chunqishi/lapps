@@ -34,7 +34,7 @@ public class TestOpenNLP extends TestCase {
 	@Test
 	public void testParser() {
 		String[] print = opennlp
-				.parser(new String[] { "Programcreek is a very huge and useful website." });
+				.parserArr(new String[] { "Programcreek is a very huge and useful website." });
 		System.out.println(print[0]);
 		 String goldPrint =
 		 "(TOP (S (NP (NN Programcreek)) (VP (VBZ is) (NP (DT a) (ADJP (RB very) (JJ huge) (CC and) (JJ useful)))) (. website.)))\n";

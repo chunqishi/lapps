@@ -38,7 +38,7 @@ public interface IOpenNLP extends WebService {
 	 * @see opennlp.tools.cmdline.BasicCmdLineTool
 	 * @see opennlp.tools.cmdline.chunker.ChunkerConverterTool
 	 */
-	public String[] chunkerMET(String[] lines) throws OpenNLPWebServiceException;
+	public String[] chunkerMETArr(String[] lines) throws OpenNLPWebServiceException;
 	
 	/**
 	 * 
@@ -53,7 +53,7 @@ public interface IOpenNLP extends WebService {
 	 * @see opennlp.tools.cmdline.BasicCmdLineTool
 	 * @see opennlp.tools.cmdline.coref.CoreferencerTool
 	 */
-	public String[] coreferencer(String[] lines) throws OpenNLPWebServiceException;
+	public String[] coreferencerArr(String[] lines) throws OpenNLPWebServiceException;
 	
 	public String[] coreferencer(String lineswithsplitter) throws OpenNLPWebServiceException;
 	
@@ -62,7 +62,7 @@ public interface IOpenNLP extends WebService {
 	 * @see opennlp.tools.cmdline.BasicCmdLineTool
 	 * @see opennlp.tools.cmdline.tokenizer.DictionaryDetokenizerTool
 	 */
-	public String[] dictionaryDetokenizer(String[] lines) throws OpenNLPWebServiceException;
+	public String[] dictionaryDetokenizerArr(String[] lines) throws OpenNLPWebServiceException;
 	
 	public String[] dictionaryDetokenizer(String lineswithsplitter) throws OpenNLPWebServiceException;
 	
@@ -71,7 +71,7 @@ public interface IOpenNLP extends WebService {
 	 * @see opennlp.tools.cmdline.BasicCmdLineTool
 	 * @see opennlp.tools.cmdline.doccat.DoccatTool
 	 */
-	public String[] doccat(String[] lines) throws OpenNLPWebServiceException;
+	public String[] doccatArr(String[] lines) throws OpenNLPWebServiceException;
 	
 	public String[] doccat(String lineswithsplitter) throws OpenNLPWebServiceException;
 	
@@ -80,7 +80,7 @@ public interface IOpenNLP extends WebService {
 	 * @see opennlp.tools.cmdline.BasicCmdLineTool
 	 * @see opennlp.tools.cmdline.parser.ParserTool
 	 */
-	public String[] parser(String[] lines) throws OpenNLPWebServiceException;
+	public String[] parserArr(String[] lines) throws OpenNLPWebServiceException;
 	
 	public String[] parser(String lineswithsplitter) throws OpenNLPWebServiceException;
 	
@@ -90,7 +90,7 @@ public interface IOpenNLP extends WebService {
 	 * @see opennlp.tools.cmdline.BasicCmdLineTool
 	 * @see opennlp.tools.cmdline.sentdetect.SentenceDetectorTool
 	 */
-	public String[] sentenceDetector(String[] lines) throws OpenNLPWebServiceException;
+	public String[] sentenceDetectorArr(String[] lines) throws OpenNLPWebServiceException;
 	
 	public String[] sentenceDetector(String lineswithsplitter) throws OpenNLPWebServiceException;
 	
@@ -100,7 +100,7 @@ public interface IOpenNLP extends WebService {
 	 * @see opennlp.tools.cmdline.BasicCmdLineTool
 	 * @see opennlp.tools.cmdline.tokenizer.SimpleTokenizerTool
 	 */
-	public String[] simpleTokenizer(String[] lines) throws OpenNLPWebServiceException;
+	public String[] simpleTokenizerArr(String[] lines) throws OpenNLPWebServiceException;
 	
 	public String[] simpleTokenizer(String lineswithsplitter) throws OpenNLPWebServiceException;
 	
@@ -109,7 +109,7 @@ public interface IOpenNLP extends WebService {
 	 * @see opennlp.tools.cmdline.BasicCmdLineTool
 	 * @see opennlp.tools.cmdline.tokenizer.TokenizerMETool
 	 */
-	public String[] tokenizerME(String[] lines) throws OpenNLPWebServiceException;
+	public String[] tokenizerMEArr(String[] lines) throws OpenNLPWebServiceException;
 	
 	public String[] tokenizerME(String lineswithsplitter) throws OpenNLPWebServiceException;
 	
@@ -118,7 +118,7 @@ public interface IOpenNLP extends WebService {
 	 * @see opennlp.tools.cmdline.BasicCmdLineTool
 	 * @see opennlp.tools.cmdline.namefind.TokenNameFinderTool
 	 */
-	public String[] tokenNameFinder(String[] lines) throws OpenNLPWebServiceException;
+	public String[] tokenNameFinderArr(String[] lines) throws OpenNLPWebServiceException;
 	
 	public String[] tokenNameFinder(String lineswithsplitter) throws OpenNLPWebServiceException;
 }

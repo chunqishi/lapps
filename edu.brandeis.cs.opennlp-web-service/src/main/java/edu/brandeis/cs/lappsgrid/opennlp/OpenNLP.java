@@ -149,7 +149,7 @@ public class OpenNLP implements IOpenNLP {
 	}
 
 	@Override
-	public String[] chunkerMET(String[] lines) {
+	public String[] chunkerMETArr(String[] lines) {
 		// default English
 		String nerModels = prop.getProperty("Chunker", "en-chunker.bin");
 		logger.info("chunkerMET(): load " + nerModels + ".");
@@ -195,7 +195,7 @@ public class OpenNLP implements IOpenNLP {
 	}
 
 	@Override
-	public String[] coreferencer(String[] lines) {
+	public String[] coreferencerArr(String[] lines) {
 		
 		// default English
 		String nerModels = prop.getProperty("Coreference",
@@ -270,7 +270,7 @@ public class OpenNLP implements IOpenNLP {
 	}
 
 	@Override
-	public String[] dictionaryDetokenizer(String[] lines) throws OpenNLPWebServiceException {
+	public String[] dictionaryDetokenizerArr(String[] lines) throws OpenNLPWebServiceException {
 		
 		String nerModels = prop.getProperty("Chunker",
 				"en-chunker.bin");
@@ -329,7 +329,7 @@ public class OpenNLP implements IOpenNLP {
 	}
 
 	@Override
-	public String[] doccat(String[] lines) throws OpenNLPWebServiceException {
+	public String[] doccatArr(String[] lines) throws OpenNLPWebServiceException {
 		throw new OpenNLPWebServiceException(
 				"doccat(): to be implemented exception");
 	}
@@ -349,7 +349,7 @@ public class OpenNLP implements IOpenNLP {
 
 	
 	@Override
-	public String[] parser(String[] lines) {		
+	public String[] parserArr(String[] lines) {		
 		String nerModels = prop.getProperty(Parser.PROP_COMPNENT_MODEL,
 				"en-parser-chunking.bin");
 		logger.info("parser(): load "+ nerModels + ".");
@@ -386,7 +386,7 @@ public class OpenNLP implements IOpenNLP {
 	
 	
 	@Override
-	public String[] sentenceDetector(String[] lines)
+	public String[] sentenceDetectorArr(String[] lines)
 			throws OpenNLPWebServiceException {
 		String nerModels = prop.getProperty(Splitter.PROP_COMPNENT_MODEL,
 				"en-sent.bin");
@@ -450,7 +450,7 @@ public class OpenNLP implements IOpenNLP {
 
 
 	@Override
-	public String[] tokenizerME(String[] lines) {
+	public String[] tokenizerMEArr(String[] lines) {
 		String nerModels = prop.getProperty(Tokenizer.PROP_COMPNENT_MODEL,
 				"en-token.bin");
 		logger.info("parser(): load " + nerModels + ".");
@@ -481,7 +481,7 @@ public class OpenNLP implements IOpenNLP {
 	}
 
 	@Override
-	public String[] tokenNameFinder(String[] lines) {
+	public String[] tokenNameFinderArr(String[] lines) {
 
 		String nerModels = prop.getProperty(
 				NamedEntityRecognizer.PROP_COMPNENT_MODEL, "en-ner-person.bin");
@@ -533,47 +533,47 @@ public class OpenNLP implements IOpenNLP {
 	@Override
 	public String[] chunkerMET(String lineswithsplitter)
 			throws OpenNLPWebServiceException {
-		return chunkerMET(SplitMergeUtil.fromStrToArr(lineswithsplitter,
+		return chunkerMETArr(SplitMergeUtil.fromStrToArr(lineswithsplitter,
 				SPLITTER_LINE));
 	}
 
 	@Override
 	public String[] coreferencer(String lineswithsplitter)
 			throws OpenNLPWebServiceException {
-		return coreferencer(SplitMergeUtil.fromStrToArr(lineswithsplitter,
+		return coreferencerArr(SplitMergeUtil.fromStrToArr(lineswithsplitter,
 				SPLITTER_LINE));
 	}
 
 	@Override
 	public String[] dictionaryDetokenizer(String lineswithsplitter)
 			throws OpenNLPWebServiceException {
-		return dictionaryDetokenizer(SplitMergeUtil.fromStrToArr(lineswithsplitter,
+		return dictionaryDetokenizerArr(SplitMergeUtil.fromStrToArr(lineswithsplitter,
 				SPLITTER_LINE));
 	}
 
 	@Override
 	public String[] doccat(String lineswithsplitter)
 			throws OpenNLPWebServiceException {
-		return doccat(SplitMergeUtil.fromStrToArr(lineswithsplitter,
+		return doccatArr(SplitMergeUtil.fromStrToArr(lineswithsplitter,
 				SPLITTER_LINE));
 	}
 
 	@Override
 	public String[] parser(String lineswithsplitter)
 			throws OpenNLPWebServiceException {
-		return parser(SplitMergeUtil.fromStrToArr(lineswithsplitter,
+		return parserArr(SplitMergeUtil.fromStrToArr(lineswithsplitter,
 				SPLITTER_LINE));
 	}
 
 	@Override
 	public String[] sentenceDetector(String lineswithsplitter)
 			throws OpenNLPWebServiceException {
-		return sentenceDetector(SplitMergeUtil.fromStrToArr(lineswithsplitter,
+		return sentenceDetectorArr(SplitMergeUtil.fromStrToArr(lineswithsplitter,
 				SPLITTER_LINE));
 	}
 
 	@Override
-	public String[] simpleTokenizer(String[] lines)
+	public String[] simpleTokenizerArr(String[] lines)
 			throws OpenNLPWebServiceException {
 		ArrayList<String> arr = new ArrayList<String>(16);
 		for (String line : lines) {
@@ -587,14 +587,14 @@ public class OpenNLP implements IOpenNLP {
 	@Override
 	public String[] tokenizerME(String lineswithsplitter)
 			throws OpenNLPWebServiceException {
-		return tokenizerME(SplitMergeUtil.fromStrToArr(lineswithsplitter,
+		return tokenizerMEArr(SplitMergeUtil.fromStrToArr(lineswithsplitter,
 				SPLITTER_LINE));
 	}
 
 	@Override
 	public String[] tokenNameFinder(String lineswithsplitter)
 			throws OpenNLPWebServiceException {
-		return tokenNameFinder(SplitMergeUtil.fromStrToArr(lineswithsplitter,
+		return tokenNameFinderArr(SplitMergeUtil.fromStrToArr(lineswithsplitter,
 				SPLITTER_LINE));
 	}
 
