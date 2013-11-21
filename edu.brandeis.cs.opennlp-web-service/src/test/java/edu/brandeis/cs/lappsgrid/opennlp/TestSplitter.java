@@ -9,7 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 /**
- * <i>TestTokenizer.java</i> Language Application Grids (<b>LAPPS</b>)
+ * <i>TestSplitter.java</i> Language Application Grids (<b>LAPPS</b>)
  * <p> 
  * <p> Test cases are from <a href="http://www.programcreek.com/2012/05/opennlp-tutorial/">OpenNLP Tutorial</a>
  * <p> 

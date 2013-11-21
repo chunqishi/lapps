@@ -4,81 +4,93 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import opennlp.tools.tokenize.TokenizerME;
-import opennlp.tools.tokenize.TokenizerModel;
-import opennlp.tools.util.Span;
+import opennlp.tools.cmdline.parser.ParserTool;
+import opennlp.tools.parser.Parse;
+import opennlp.tools.parser.ParserFactory;
+import opennlp.tools.parser.ParserModel;
 
 import org.anc.resource.ResourceLoader;
 import org.lappsgrid.api.Data;
 import org.lappsgrid.core.DataFactory;
-import org.lappsgrid.discriminator.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.brandeis.cs.lappsgrid.api.opennlp.ITokenizer;
+import edu.brandeis.cs.lappsgrid.api.opennlp.IParser;
 
 /**
- * <i>AbstractOpenNLPWebService.java</i> Language Application Grids (<b>LAPPS</b>)
- * <p> 
- * <p><a href="http://opennlp.sourceforge.net/models-1.5/">Models for 1.5 series</a>
- * <p> 
- *
- * @author Chunqi Shi ( <i>shicq@cs.brandeis.edu</i> )<br>Nov 20, 2013<br>
+ * <i>Parser.java</i> Language Application Grids
+ * (<b>LAPPS</b>)
+ * <p>
+ * <p>
+ * <a href="http://opennlp.sourceforge.net/models-1.5/">Models for 1.5
+ * series</a>
+ * <p>
+ * 
+ * @author Chunqi Shi ( <i>shicq@cs.brandeis.edu</i> )<br>
+ *         Nov 20, 2013<br>
  * 
  */
-public class Parser implements ITokenizer {
-    protected static final Logger logger = LoggerFactory.getLogger(Parser.class);
-    
-    private opennlp.tools.tokenize.Tokenizer tokenizer;
-    
-    
+public class Parser implements IParser {
+	protected static final Logger logger = LoggerFactory
+			.getLogger(Parser.class);
+
+	private opennlp.tools.parser.Parser parser;
+
 	public Parser() throws OpenNLPWebServiceException {
 		init();
 	}
-    
+
 	protected void init() throws OpenNLPWebServiceException {
-	      logger.info("init(): Creating OpenNLP Tokenizer ...");
-	      
-	      Properties prop = new Properties();          
-	      InputStream stream = ResourceLoader.open("opennlp-web-service.properties");
-	      if (stream == null) {
-	    	  logger.error("init(): fail to open \"opennlp-web-service.properties\".");
-	    	  throw new OpenNLPWebServiceException("init(): fail to open \"opennlp-web-service.properties\".");
-	      }
-	      try {
-	    	  prop.load(stream);
-	    	  stream.close();
-	      } catch (IOException e) {
-	    	  logger.error("init(): fail to load \"opennlp-web-service.properties\".");
-	    	  throw new OpenNLPWebServiceException("init(): fail to load \"opennlp-web-service.properties\".");
-	      }
-	      
-	      // default English
-	      String tokenModel = prop.getProperty(PROP_COMPNENT_MODEL, "en-token.bin");
-	      
-	      logger.info("init(): load opennlp-web-service.properties.");
-	      
-	      stream = ResourceLoader.open(tokenModel);
-	      if (stream == null) {
-	    	  logger.error("init(): fail to open TOKEN MODEl \""+tokenModel+"\".");
-	    	  throw new OpenNLPWebServiceException("init(): fail to open TOKEN MODEl \""+tokenModel+"\".");
-	      }
-	      
-	      logger.info("init(): load TOKEN MODEl \""+tokenModel+"\"");
-	     
+		logger.info("init(): Creating OpenNLP Parser ...");
+
+		Properties prop = new Properties();
+		InputStream stream = ResourceLoader
+				.open("opennlp-web-service.properties");
+		if (stream == null) {
+			logger.error("init(): fail to open \"opennlp-web-service.properties\".");
+			throw new OpenNLPWebServiceException(
+					"init(): fail to open \"opennlp-web-service.properties\".");
+		}
+		try {
+			prop.load(stream);
+			stream.close();
+		} catch (IOException e) {
+			logger.error("init(): fail to load \"opennlp-web-service.properties\".");
+			throw new OpenNLPWebServiceException(
+					"init(): fail to load \"opennlp-web-service.properties\".");
+		}
+
+		// default English
+		String parserModel = prop.getProperty(PROP_COMPNENT_MODEL,
+				"en-parser-chunking.bin");
+
+		logger.info("init(): load opennlp-web-service.properties.");
+
+		stream = ResourceLoader.open(parserModel);
+		if (stream == null) {
+			logger.error("init(): fail to open PARSER MODEl \"" + parserModel
+					+ "\".");
+			throw new OpenNLPWebServiceException(
+					"init(): fail to open PARSER MODEl \"" + parserModel + "\".");
+		}
+
+		logger.info("init(): load PARSER MODEl \"" + parserModel + "\"");
+
 		try {
 			try {
-				TokenizerModel model = new TokenizerModel(stream);
-				tokenizer = new TokenizerME(model);
+				ParserModel model = new ParserModel(stream);
+				parser = ParserFactory.create(model);
 			} finally {
 				stream.close();
 			}
 		} catch (IOException e) {
-	    	  logger.error("init(): fail to load TOKEN MODEl \""+tokenModel+"\".");
-	    	  throw new OpenNLPWebServiceException("init(): fail to load TOKEN MODEl \""+tokenModel+"\".");
+			logger.error("init(): fail to load PARSER MODEl \"" + parserModel
+					+ "\".");
+			throw new OpenNLPWebServiceException(
+					"init(): fail to load PARSER MODEl \"" + parserModel + "\".");
 		}
-		
-      logger.info("init(): Creating OpenNLP Tokenizer!");
+
+		logger.info("init(): Creating OpenNLP Parser!");
 	}
 
 	@Override
@@ -88,23 +100,23 @@ public class Parser implements ITokenizer {
 
 	@Override
 	public Data execute(Data data) {
-		logger.info("execute(): Execute OpenNLP tokenizer ...");
+		logger.info("execute(): Execute OpenNLP Parser ...");
 
-		if (tokenizer == null) {
+		if (parser == null) {
 			try {
 				init();
 			} catch (OpenNLPWebServiceException e) {
-				logger.error("execute(): Fail to initialize Tokenizer");
+				logger.error("execute(): Fail to initialize Parser");
 				return DataFactory
-						.error("execute(): Fail to initialize Tokenizer");
+						.error("execute(): Fail to initialize Parser");
 			}
 		}
 
-		String[] tokens = tokenize(data.getPayload());
-		logger.info("execute(): Execute OpenNLP tokenizer!");
-		return DataFactory.stringList(tokens);
+		String parser = parse(data.getPayload());
+		logger.info("execute(): Execute OpenNLP Parser!");
+		return DataFactory.text(parser);
 	}
-	
+
 	@Override
 	public long[] requires() {
 		return TYPES_REQUIRES;
@@ -116,29 +128,25 @@ public class Parser implements ITokenizer {
 	}
 
 	@Override
-	public String[] tokenize(String s) {
-		if (tokenizer == null) {
+	public String parse(String sentence) {
+		if (parser == null) {
 			try {
 				init();
 			} catch (OpenNLPWebServiceException e) {
-				throw new RuntimeException("tokenize(): Fail to initialize Tokenizer", e);
+				throw new RuntimeException(
+						"parse(): Fail to initialize Parser", e);
 			}
 		}
-		String tokens[] = tokenizer.tokenize(s);
-		return tokens;
-	}
 
-	@Override
-	public Span[] tokenizePos(String s) {
-		if (tokenizer == null) {
-			try {
-				init();
-			} catch (OpenNLPWebServiceException e) {
-				throw new RuntimeException("tokenize(): Fail to initialize Tokenizer", e);
-			}
+		StringBuffer builder = new StringBuffer();
+		Parse parses[] = ParserTool.parseLine(sentence, parser, 1);
+
+		for (int pi = 0, pn = parses.length; pi < pn; pi++) {
+			parses[pi].show(builder);
+			builder.append("\n");
 		}
-		Span [] boundaries = tokenizer.tokenizePos(s);
-		return boundaries;
+
+		return builder.toString();
 	}
 
 }

@@ -11,14 +11,13 @@ import opennlp.tools.util.Span;
 import org.anc.resource.ResourceLoader;
 import org.lappsgrid.api.Data;
 import org.lappsgrid.core.DataFactory;
-import org.lappsgrid.discriminator.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.brandeis.cs.lappsgrid.api.opennlp.ITokenizer;
 
 /**
- * <i>AbstractOpenNLPWebService.java</i> Language Application Grids (<b>LAPPS</b>)
+ * <i>Tokenizer.java</i> Language Application Grids (<b>LAPPS</b>)
  * <p> 
  * <p><a href="http://opennlp.sourceforge.net/models-1.5/">Models for 1.5 series</a>
  * <p> 

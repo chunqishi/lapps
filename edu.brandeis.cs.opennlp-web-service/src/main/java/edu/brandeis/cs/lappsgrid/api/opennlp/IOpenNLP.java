@@ -17,7 +17,7 @@ import org.lappsgrid.api.WebService;
  *    <b>parser</b>: <i><b>OpenNLP</b></i>, Stanford, GATE NC+VC<br>
  *    <b>named-entity recoginzer (NER)</b>: <i><b>OpenNLP</b></i>, Gate <br> </p>
  * <p><a href="http://opennlp.apache.org/documentation/manual/opennlp.html">Apache OpenNLP Developer Document</a> 
- * <p> 
+ * <p>Implement interface from {@link opennlp.tools.cmdline.BasicCmdLineTool} 
  * <p> 
  *
  * @author Chunqi Shi ( <i>shicq@cs.brandeis.edu</i> )<br>Nov 19, 2013<br>

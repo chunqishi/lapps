@@ -4,21 +4,20 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import opennlp.tools.tokenize.TokenizerME;
-import opennlp.tools.tokenize.TokenizerModel;
-import opennlp.tools.util.Span;
+import opennlp.tools.postag.POSModel;
+import opennlp.tools.postag.POSTaggerME;
+import opennlp.tools.util.Sequence;
 
 import org.anc.resource.ResourceLoader;
 import org.lappsgrid.api.Data;
 import org.lappsgrid.core.DataFactory;
-import org.lappsgrid.discriminator.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.brandeis.cs.lappsgrid.api.opennlp.ITokenizer;
+import edu.brandeis.cs.lappsgrid.api.opennlp.IPOSTagger;
 
 /**
- * <i>AbstractOpenNLPWebService.java</i> Language Application Grids (<b>LAPPS</b>)
+ * <i>POSTagger.java</i> Language Application Grids (<b>LAPPS</b>)
  * <p> 
  * <p><a href="http://opennlp.sourceforge.net/models-1.5/">Models for 1.5 series</a>
  * <p> 
@@ -26,10 +25,10 @@ import edu.brandeis.cs.lappsgrid.api.opennlp.ITokenizer;
  * @author Chunqi Shi ( <i>shicq@cs.brandeis.edu</i> )<br>Nov 20, 2013<br>
  * 
  */
-public class POSTagger implements ITokenizer {
+public class POSTagger implements IPOSTagger {
     protected static final Logger logger = LoggerFactory.getLogger(POSTagger.class);
     
-    private opennlp.tools.tokenize.Tokenizer tokenizer;
+    private opennlp.tools.postag.POSTagger postagger;
     
     
 	public POSTagger() throws OpenNLPWebServiceException {
@@ -37,7 +36,7 @@ public class POSTagger implements ITokenizer {
 	}
     
 	protected void init() throws OpenNLPWebServiceException {
-	      logger.info("init(): Creating OpenNLP Tokenizer ...");
+	      logger.info("init(): Creating OpenNLP POSTagger ...");
 	      
 	      Properties prop = new Properties();          
 	      InputStream stream = ResourceLoader.open("opennlp-web-service.properties");
@@ -54,31 +53,31 @@ public class POSTagger implements ITokenizer {
 	      }
 	      
 	      // default English
-	      String tokenModel = prop.getProperty(PROP_COMPNENT_MODEL, "en-token.bin");
+	      String taggerModel = prop.getProperty(PROP_COMPNENT_MODEL__Maxent, "en-pos-maxent.bin");
 	      
 	      logger.info("init(): load opennlp-web-service.properties.");
 	      
-	      stream = ResourceLoader.open(tokenModel);
+	      stream = ResourceLoader.open(taggerModel);
 	      if (stream == null) {
-	    	  logger.error("init(): fail to open TOKEN MODEl \""+tokenModel+"\".");
-	    	  throw new OpenNLPWebServiceException("init(): fail to open TOKEN MODEl \""+tokenModel+"\".");
+	    	  logger.error("init(): fail to open POSTAGGER MODEl \""+taggerModel+"\".");
+	    	  throw new OpenNLPWebServiceException("init(): fail to open POSTAGGER MODEl \""+taggerModel+"\".");
 	      }
 	      
-	      logger.info("init(): load TOKEN MODEl \""+tokenModel+"\"");
+	      logger.info("init(): load POSTAGGER MODEl \""+taggerModel+"\"");
 	     
 		try {
 			try {
-				TokenizerModel model = new TokenizerModel(stream);
-				tokenizer = new TokenizerME(model);
+				POSModel model = new POSModel(stream);
+				postagger = new POSTaggerME(model);
 			} finally {
 				stream.close();
 			}
 		} catch (IOException e) {
-	    	  logger.error("init(): fail to load TOKEN MODEl \""+tokenModel+"\".");
-	    	  throw new OpenNLPWebServiceException("init(): fail to load TOKEN MODEl \""+tokenModel+"\".");
+	    	  logger.error("init(): fail to load POSTAGGER MODEl \""+taggerModel+"\".");
+	    	  throw new OpenNLPWebServiceException("init(): fail to load POSTAGGER MODEl \""+taggerModel+"\".");
 		}
 		
-      logger.info("init(): Creating OpenNLP Tokenizer!");
+      logger.info("init(): Creating OpenNLP POSTagger!");
 	}
 
 	@Override
@@ -88,21 +87,21 @@ public class POSTagger implements ITokenizer {
 
 	@Override
 	public Data execute(Data data) {
-		logger.info("execute(): Execute OpenNLP tokenizer ...");
+		logger.info("execute(): Execute OpenNLP POSTagger ...");
 
-		if (tokenizer == null) {
+		if (postagger == null) {
 			try {
 				init();
 			} catch (OpenNLPWebServiceException e) {
-				logger.error("execute(): Fail to initialize Tokenizer");
+				logger.error("execute(): Fail to initialize POSTagger");
 				return DataFactory
-						.error("execute(): Fail to initialize Tokenizer");
+						.error("execute(): Fail to initialize POSTagger");
 			}
 		}
-
-		String[] tokens = tokenize(data.getPayload());
-		logger.info("execute(): Execute OpenNLP tokenizer!");
-		return DataFactory.stringList(tokens);
+		String[] sentences = data.getPayload().split("\\n+");
+		String[] tags = tag(sentences);
+		logger.info("execute(): Execute OpenNLP POSTagger!");
+		return DataFactory.stringList(tags);
 	}
 	
 	@Override
@@ -115,30 +114,32 @@ public class POSTagger implements ITokenizer {
 		return TYPES_PRODUCES;
 	}
 
-	@Override
-	public String[] tokenize(String s) {
-		if (tokenizer == null) {
-			try {
-				init();
-			} catch (OpenNLPWebServiceException e) {
-				throw new RuntimeException("tokenize(): Fail to initialize Tokenizer", e);
-			}
-		}
-		String tokens[] = tokenizer.tokenize(s);
-		return tokens;
-	}
 
 	@Override
-	public Span[] tokenizePos(String s) {
-		if (tokenizer == null) {
+	public String[] tag(String[] sentence) {
+		if (postagger == null) {
 			try {
 				init();
 			} catch (OpenNLPWebServiceException e) {
-				throw new RuntimeException("tokenize(): Fail to initialize Tokenizer", e);
+				throw new RuntimeException("tokenize(): Fail to initialize POSTagger", e);
 			}
 		}
-		Span [] boundaries = tokenizer.tokenizePos(s);
-		return boundaries;
+		String tags[] = postagger.tag(sentence);
+		return tags;
+	}
+
+
+	@Override
+	public Sequence[] topKSequences(String[] sentence) {
+		if (postagger == null) {
+			try {
+				init();
+			} catch (OpenNLPWebServiceException e) {
+				throw new RuntimeException("tokenize(): Fail to initialize POSTagger", e);
+			}
+		}
+		Sequence tags[] = postagger.topKSequences(sentence);
+		return tags;
 	}
 
 }

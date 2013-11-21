@@ -63,10 +63,10 @@ public class Splitter implements ISplitter {
 	      stream = ResourceLoader.open(sentenceModel);
 	      if (stream == null) {
 	    	  logger.error("init(): fail to open SENTENCE MODEl \""+sentenceModel+"\".");
-	    	  throw new OpenNLPWebServiceException("init(): fail to open TOKEN MODEl \""+sentenceModel+"\".");
+	    	  throw new OpenNLPWebServiceException("init(): fail to open SENTENCE MODEl \""+sentenceModel+"\".");
 	      }
 	      
-	      logger.info("init(): load TOKEN MODEl \""+sentenceModel+"\"");
+	      logger.info("init(): load SENTENCE MODEl \""+sentenceModel+"\"");
 	     
 		try {
 			try {
