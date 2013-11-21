@@ -2,6 +2,7 @@ package edu.brandeis.cs.lappsgrid.opennlp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Properties;
 
 import opennlp.tools.namefind.NameFinderME;
@@ -33,12 +34,40 @@ public class NamedEntityRecognizer implements INamedEntityRecognizer {
 	protected static final Logger logger = LoggerFactory
 			.getLogger(NamedEntityRecognizer.class);
 
-	private TokenNameFinder nameFinder;
+	private ArrayList<TokenNameFinder> nameFinders = new ArrayList<TokenNameFinder> ();
 
 	public NamedEntityRecognizer() throws OpenNLPWebServiceException {
 		init();
 	}
 
+	protected static final TokenNameFinder load(String nerModel) throws OpenNLPWebServiceException {
+		TokenNameFinder nameFinder;
+		InputStream stream = ResourceLoader.open(nerModel);
+		if (stream == null) {
+			logger.error("load(): fail to open NER MODEL \"" + nerModel
+					+ "\".");
+			throw new OpenNLPWebServiceException(
+					"load(): fail to open NER MODEL \"" + nerModel + "\".");
+		}
+
+		logger.info("load(): load NER MODEL \"" + nerModel + "\"");
+
+		try {
+			try {
+				TokenNameFinderModel model = new TokenNameFinderModel(stream);
+				nameFinder = new NameFinderME(model);
+			} finally {
+				stream.close();
+			}
+		} catch (IOException e) {
+			logger.error("load(): fail to load NER MODEL \"" + nerModel
+					+ "\".");
+			throw new OpenNLPWebServiceException(
+					"load(): fail to load NER MODEL \"" + nerModel + "\".");
+		}
+		return nameFinder;
+	}
+	
 	protected void init() throws OpenNLPWebServiceException {
 		logger.info("init(): Creating OpenNLP NamedEntityRecognizer ...");
 
@@ -60,33 +89,15 @@ public class NamedEntityRecognizer implements INamedEntityRecognizer {
 		}
 
 		// default English
-		String nerModel = prop.getProperty(PROP_COMPNENT_MODEL,
+		String nerModels = prop.getProperty(PROP_COMPNENT_MODEL,
 				"en-ner-person.bin");
-
 		logger.info("init(): load opennlp-web-service.properties.");
 
-		stream = ResourceLoader.open(nerModel);
-		if (stream == null) {
-			logger.error("init(): fail to open NER MODEl \"" + nerModel
-					+ "\".");
-			throw new OpenNLPWebServiceException(
-					"init(): fail to open NER MODEl \"" + nerModel + "\".");
-		}
-
-		logger.info("init(): load NER MODEl \"" + nerModel + "\"");
-
-		try {
-			try {
-				TokenNameFinderModel model = new TokenNameFinderModel(stream);
-				nameFinder = new NameFinderME(model);
-			} finally {
-				stream.close();
-			}
-		} catch (IOException e) {
-			logger.error("init(): fail to load NER MODEl \"" + nerModel
-					+ "\".");
-			throw new OpenNLPWebServiceException(
-					"init(): fail to load NER MODEl \"" + nerModel + "\".");
+		for (String nerModel : nerModels.split(":")) {
+			logger.info("init(): load "+nerModel+" ...");
+			TokenNameFinder nameFinder = load(nerModel);
+			if (nameFinder != null) 
+				nameFinders.add(nameFinder);
 		}
 
 		logger.info("init(): Creating OpenNLP NamedEntityRecognizer!");
@@ -101,7 +112,7 @@ public class NamedEntityRecognizer implements INamedEntityRecognizer {
 	public Data execute(Data data) {
 		logger.info("execute(): Execute OpenNLP NamedEntityRecognizer ...");
 
-		if (nameFinder == null) {
+		if (nameFinders.size() == 0) {
 			try {
 				init();
 			} catch (OpenNLPWebServiceException e) {
@@ -144,7 +155,7 @@ public class NamedEntityRecognizer implements INamedEntityRecognizer {
 
 	@Override
 	public Span[] find(String[] tokens) {
-		if (nameFinder == null) {
+		if (nameFinders.size() == 0) {
 			try {
 				init();
 			} catch (OpenNLPWebServiceException e) {
@@ -153,8 +164,14 @@ public class NamedEntityRecognizer implements INamedEntityRecognizer {
 						e);
 			}
 		}
-		Span[] boundaries = nameFinder.find(tokens);
-		return boundaries;
+		ArrayList<Span> spanArr = new ArrayList<Span>(16);
+		for (TokenNameFinder nameFinder : nameFinders) {
+			Span[] partSpans = nameFinder.find(tokens);
+			for (Span span:partSpans)
+				spanArr.add(span);
+		}
+		
+		return spanArr.toArray(new Span[spanArr.size()]);
 	}
 
 }

@@ -33,11 +33,11 @@ public class TestNamedEntityRecognizer extends TestCase {
 	@Test
 	public void testFind() {
 		String tokens[] = SimpleTokenizer.INSTANCE
-				.tokenize("Mike, Smith is a good person.");
+				.tokenize("Mike, Smith is a good person and he is from Boston.");
 		System.out.println(Arrays.toString(tokens));
 		Span[] spans = ner.find(tokens);
 		System.out.println(Arrays.toString(spans));
-		Span[] goldSpans = { new Span(0, 1, "person"), new Span(2, 3, "person") };
+		Span[] goldSpans = { new Span(0, 1, "person"), new Span(2, 3, "person"), new Span(11,12,"location") };
 		Assert.assertArrayEquals("NamedEntityRecognizer Failure.", spans,
 				goldSpans);
 	}
