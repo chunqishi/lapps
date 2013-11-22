@@ -1,5 +1,6 @@
 package edu.brandeis.cs.lappsgrid.util;
 
+
 /**
  * <i>SplitMergeUtil.java</i> Language Application Grids (<b>LAPPS</b>)
  * <p> 
@@ -26,4 +27,6 @@ public class SplitMergeUtil {
 		builder.setLength(builder.length() - splitter.length());
 		return builder.toString();
 	}
+	
+	
 }
