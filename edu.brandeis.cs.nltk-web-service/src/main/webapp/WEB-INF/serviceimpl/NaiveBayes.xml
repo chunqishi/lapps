@@ -3,7 +3,7 @@
 <beans>
   <bean id="target" class="jp.go.nict.langrid.servicecontainer.handler.TargetServiceFactory" >
     <property name="service">
-      <bean class="edu.brandeis.cs.lappsgrid.opennlp.Tokenizer" />
+      <bean class="edu.brandeis.cs.nltk.classifier.NaiveBayesClassifier" />
     </property>
   </bean>
 </beans>
