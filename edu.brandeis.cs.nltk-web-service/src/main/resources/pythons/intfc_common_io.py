@@ -32,6 +32,8 @@ def include(filename):
 ##
 
 def dump(data, path, id):
+    if not os.path.exists(path):
+        os.makedirs(path)            
     file = os.path.join(path, id)
     output = open(file, 'wb')
     pickle.dump(data, output)
@@ -43,32 +45,34 @@ def load(path, id):
     data = pickle.load(pkl_file)
     return data
 
-def save_commons(commons, root,id):
-    path = os.path.join(root, 'commons')
+def save_commons(commons, home,id):
+    path = os.path.join(home, 'commons')
     dump(commons, path, id)
     
-def load_commons(root,id):
-    path = os.path.join(root, 'commons')
+def load_commons(home,id):
+    path = os.path.join(home, 'commons')
     commons = load(path, id)
     return commons
 
-def save_features(features, root,id):
-    path = os.path.join(root, 'features')
+def save_features(features, home,id):
+    path = os.path.join(home, 'features')
     dump(features, path, id)
     
-def load_features(root,id):
-    path = os.path.join(root, 'features')
+def load_features(home,id):
+    path = os.path.join(home, 'features')
     features = load(path, id)
     return features
 
-def save_classifiers(classifiers, root,id):
-    path = os.path.join(root, 'classifiers')
+def save_classifiers(classifiers, home,id):
+    path = os.path.join(home, 'classifiers')
     dump(classifiers, path, id)
     
-def load_classifiers(root,id):
-    path = os.path.join(root, 'classifiers')
+def load_classifiers(home,id):
+    path = os.path.join(home, 'classifiers')
     classifiers = load(path, id)
     return classifiers
 
-    
+def home():    
+    return os.path.dirname(os.path.dirname(os.path.realpath(sys.argv[0]))) 
+
 

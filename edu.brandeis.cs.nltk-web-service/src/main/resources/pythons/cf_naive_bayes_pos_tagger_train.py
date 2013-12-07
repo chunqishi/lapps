@@ -12,9 +12,7 @@
 import sys,os,time,nltk, cPickle as pickle
 from nltk.corpus import *
 
-from intfc_common_io import log, load_features, save_classifiers
-
-featuresID = sys.argv[1]
+from intfc_common_io import log,home,load_features, save_classifiers
 
 def train_naive_bayes(path, fname):
     name='naive_bayes' + '_._' + fname
@@ -26,7 +24,11 @@ def train_naive_bayes(path, fname):
     save_classifiers(classifier, path, name)
     log("dump classifier")
     
+def main():
+    featuresID = sys.argv[1]
+    train_naive_bayes(home(), featuresID)
+    print featuresID
 
-train_naive_bayes('../', featuresID)
+if __name__ == "__main__":
+    main()
 
-print featuresID

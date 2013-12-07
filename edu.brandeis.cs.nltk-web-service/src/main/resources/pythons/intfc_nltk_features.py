@@ -5,7 +5,7 @@
 #                                                #
  
 import sys,os,time,nltk, cPickle as pickle
-from intfc_common_io import log, save_features, load_features
+from intfc_common_io import log, home, save_features, load_features
 
 from nltk.corpus import *
 log("import nltk.corpus")
@@ -60,4 +60,9 @@ def features_brown_news(path):
     log("dump featuresets")
     return name
 
-features_brown_news('../')
+def main():
+        features_brown_news(home())
+
+if __name__ == "__main__":
+    main()
+

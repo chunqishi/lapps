@@ -28,7 +28,7 @@ public interface IClassify {
 	 * @return classification label.
 	 * @throws ClassifyException
 	 */
-	public String predict(String input, String classifierID) throws ClassifyException;
+	public String predict(String classifierID, String input) throws ClassifyException;
 
 	/**
 	 * 

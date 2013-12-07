@@ -12,9 +12,7 @@
 import sys,os,time,nltk, cPickle as pickle
 from nltk.corpus import *
 
-from intfc_common_io import log, load_features, save_classifiers
-
-featuresID = sys.argv[1]
+from intfc_common_io import log, home, load_features, save_classifiers
 
 def train_decision_tree(path, fname):
     name='decision_tree' + '_._' + fname
@@ -27,6 +25,12 @@ def train_decision_tree(path, fname):
     log("dump classifier")
     
 
-train_decision_tree('../', featuresID)
+def main():
+    featuresID = sys.argv[1]
+    train_decision_tree(home(), featuresID)
+    print featuresID
 
-print featuresID
+
+if __name__ == "__main__":
+    main()
+

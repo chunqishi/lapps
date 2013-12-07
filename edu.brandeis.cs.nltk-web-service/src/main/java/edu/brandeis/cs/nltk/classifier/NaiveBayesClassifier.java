@@ -10,9 +10,9 @@ import edu.brandeis.cs.nltk.IClassify;
  */
 public class NaiveBayesClassifier extends AbstractPythonClassifier implements IClassify {
 
-	public static final String PY_CF_DECISION_TREE_TRAIN = "cf_naive_bayes_pos_tagger_train.py";
-	public static final String PY_CF_DECISION_TREE_PREDICT = "cf_naive_bayes_pos_tagger_predict.py";
-	
+	public static final String PY_CF_DECISION_TREE_TRAIN = "pythons/cf_naive_bayes_pos_tagger_train.py";
+	public static final String PY_CF_DECISION_TREE_PREDICT = "pythons/cf_naive_bayes_pos_tagger_predict.py";
+	public static final String FILEPREFIX = "naive_bayes_._";
 	
 	@Override
 	public String getTrainPython() {
@@ -23,4 +23,10 @@ public class NaiveBayesClassifier extends AbstractPythonClassifier implements IC
 	public String getPredictPython() {
 		return PY_CF_DECISION_TREE_PREDICT;
 	}
+	
+	@Override
+	protected String getClassifierFileNames(String classifierID) {
+		return FILEPREFIX + classifierID;
+	}
+
 }
