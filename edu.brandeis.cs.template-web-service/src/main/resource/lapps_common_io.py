@@ -5,7 +5,7 @@
 # @date:    dec 14, 2013
 #                                                #
  
-import sys, os, time, inspect, imp, shlex
+import sys, os, time, inspect, imp
 import cPickle as pickle
 import ConfigParser
 
@@ -13,21 +13,27 @@ import ConfigParser
 #        CONSTANTS           #               
 ##  ##                  ##  ##    
 
-CONF_FILE="lapps.conf"
-CONF_SECTION_DEFAULT="default"
-CONF_PICKLE_PATH="PickleHome"
+CONF_FILE = "lapps.conf"
+CONF_SECTION_DEFAULT = "default"
+CONF_PICKLE_PATH = "PickleHome"
 
-CONF_PYTHON_SECTION_LOADS="Loads"
-CONF_PYTHON_SECTION_LOADS_SEPARATOR=","
-CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR=":"
-CONF_PYTHON_SECTION_FILE="PythonFile"
-CONF_PYTHON_SECTION_FUNC="Method"
-CONF_PYTHON_SECTION_ARGS="Args"
-CONF_PYTHON_SECTION_RETURN="Return"
-CONF_PYTHON_SECTION_DUMPS="Dumps"
+CONF_PYTHON_SECTION_GLOBALS = "Globals"
+CONF_PYTHON_SECTION_GLOBALS_SEPARATOR = ","
+CONF_PYTHON_SECTION_GLOBALS_SETATTR_SEPARATOR = ":"
+CONF_PYTHON_SECTION_REQUIRES = "Requires"
+CONF_PYTHON_SECTION_REQUIRES_SEPARATOR = ","
+CONF_PYTHON_SECTION_LOADS = "Loads"
+CONF_PYTHON_SECTION_LOADS_SEPARATOR = ","
+CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR = ":"
+CONF_PYTHON_SECTION_FILE = "PythonFile"
+CONF_PYTHON_SECTION_FUNC = "Method"
+CONF_PYTHON_SECTION_ARGS = "Args"
+CONF_PYTHON_SECTION_RETURN = "Return"
+CONF_PYTHON_SECTION_DUMPS = "Dumps"
 
-DEFAULT_PICKLE_DIR="pickle_directory"
-DEFAULT_PICKLE_SUFFIX=".pkl"
+
+DEFAULT_PICKLE_DIR = "pickle_directory"
+DEFAULT_PICKLE_SUFFIX = ".pkl"
 
 ##
 #    
@@ -106,7 +112,11 @@ def getConf(section, key):
     _config_file = os.path.join(directory(), CONF_FILE)
     if os.path.exists(_config_file):
         _config.read(_config_file)
-    return _config.get(section, key)
+    try:   
+        _value = _config.get(section, key)
+    except ConfigParser.NoOptionError:  
+        _value = None   
+    return _value
 
 def setConf(section, key, value):
     _config.set(section, key, value)
@@ -204,30 +214,91 @@ def dumpFromAttr(module, attrName, pickleId):
     pickleDefDump(_namePickleObj, pickleId)
     return _namePickleObj
 
+def dumpFromLine(line, pickleId):
+    _namePickleObj = eval(line)
+    pickleDefDump(_namePickleObj, pickleId)
+    return _namePickleObj
+
 def runPythonConfSection(pySectionName):
+    '''  configuration Python section '''
+    ''' load required sections '''
+    _requiresConf = getConf(pySectionName, CONF_PYTHON_SECTION_REQUIRES)    
+    if not _requiresConf == None: 
+        _requires = _requiresConf.split(CONF_PYTHON_SECTION_REQUIRES_SEPARATOR)
+        _returnRequires = []
+        for _require in _requires:
+            _required = _require.strip()
+            if len(_required) > 0:
+                _returnRequire = runPythonConfSection(_required)    
+                _returnRequires.append(_returnRequire)
+    ''' load module '''
     _moduleConf = getConf(pySectionName, CONF_PYTHON_SECTION_FILE)
-    _module = loadModuleAs(_moduleConf, pySectionName)
-    _loadConf = getConf(pySectionName, CONF_PYTHON_SECTION_LOADS)
-    if CONF_PYTHON_SECTION_LOADS_SEPARATOR in _loadConf:
-        _loads = _loadConf.split(CONF_PYTHON_SECTION_LOADS_SEPARATOR)
-        for _load in _loads:
-            if CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR in _load:
-                _picklePair = _load.split(CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR)
+    if not _moduleConf == None:
+        _module = loadModule(_moduleConf)
+        _globalModule = sys.modules[__name__]
+        _objNames = []
+        _gobjNames = []
+    #    _module = loadModuleAs(_moduleConf, pySectionName)
+        ''' read pick load '''
+        _loadConf = getConf(pySectionName, CONF_PYTHON_SECTION_LOADS)
+        if not _loadConf == None: 
+            _loads = _loadConf.split(CONF_PYTHON_SECTION_LOADS_SEPARATOR)
+            for _load in _loads:
+                if CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR in _load:
+                    _picklePair = _load.split(CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR)
+                    _objName = _picklePair[0].strip()
+                    _pickleId = _picklePair[1].strip()            
+                    _namePickleObj = loadToAttr(_globalModule, _objName, _pickleId)
+                    _gobjNames.append(_objName)
+        ''' set global variables '''
+        _globalConf = getConf(pySectionName, CONF_PYTHON_SECTION_GLOBALS)
+        if not _globalConf == None:            
+            _globals = _globalConf.split(CONF_PYTHON_SECTION_GLOBALS_SEPARATOR)
+            for _global in _globals:
+                if CONF_PYTHON_SECTION_GLOBALS_SETATTR_SEPARATOR in _global:
+                    _globalPair = _global.split(CONF_PYTHON_SECTION_GLOBALS_SETATTR_SEPARATOR)
+                    _gobjName = _globalPair[0].strip()
+                    _gobjRef = _globalPair[1].strip()      
+                    _nameGObj = eval(_gobjRef)
+                    setattr(_module, _gobjName, _nameGObj)
+                    _objNames.append(_gobjName)                    
+        ''' configured function '''        
+        _funcConf = getConf(pySectionName, CONF_PYTHON_SECTION_FUNC)
+        if not _funcConf == None: 
+            _argsConf = getConf(pySectionName, CONF_PYTHON_SECTION_ARGS)
+            if _argsConf == None:
+                 _argsConf = ""
+            _return = runModuleFuncArgsLine(_module, _funcConf, _argsConf)
+            _returnConf = getConf(pySectionName, CONF_PYTHON_SECTION_RETURN)
+            if not _returnConf == None: 
+                setattr(_globalModule, _returnConf, _return)
+                _gobjNames.append(_returnConf)
+    ''' write pick dump '''              
+    _dumpConf = getConf(pySectionName, CONF_PYTHON_SECTION_DUMPS)
+    if not _dumpConf == None: 
+        _dumps = _dumpConf.split(CONF_PYTHON_SECTION_LOADS_SEPARATOR)
+        for _dump in _dumps:
+            if CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR in _dump:
+                _picklePair = _dump.split(CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR)
                 _objName = _picklePair[0].strip()
                 _pickleId = _picklePair[1].strip()
-                _globalModule = sys.modules[__name__]
-                loadToAttr(_globalModule, _objName, _pickleId)
-    _funcConf = getConf(pySectionName, CONF_PYTHON_SECTION_FUNC)
-    _argsConf = getConf(pySectionName, CONF_PYTHON_SECTION_ARGS)
-    _return = runModuleFuncArgsLine(_module, _funcConf, _argsConf)
-    _returnConf = getConf(pySectionName, CONF_PYTHON_SECTION_RETURN)
-    setattr(_module, _returnConf, _return)
-    _dumpConf = getConf(pySectionName, CONF_PYTHON_SECTION_DUMPS)
-    if CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR in _dumpConf:
-        _picklePair = _dumpConf.split(CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR)
-        _objName = _picklePair[0].strip()
-        _pickleId = _picklePair[1].strip()
-        dumpFromAttr(_module, _objName, _pickleId)
-    return _return
+                dumpFromLine(_objName, _pickleId)
+    ''' clean attributes '''
+    if not _moduleConf == None:        
+        for _objName in _objNames:
+            delattr(_module, _objName)
+        for _gobjName in _gobjNames:
+            delattr(_globalModule, _gobjName)   
+        if not _funcConf == None:      
+            return _return
+    ''' if has required sections '''
+    if not _requiresConf == None:          
+        return _returnRequires
 
+
+def main():        
+    print runPythonConfSection(sys.argv[1])
+
+if __name__ == "__main__":
+    main()
 

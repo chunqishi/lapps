@@ -1,3 +1,0 @@
-S'HelloWorld!'
-p1
-.
