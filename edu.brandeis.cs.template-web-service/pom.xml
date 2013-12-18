@@ -54,11 +54,6 @@ Provide converter for the OpenNLP one-per-line format to LEDS.</description>
 		<artifactId>slf4j-api</artifactId>
 		<version>1.7.5</version>
 	</dependency>	
-	<dependency>
-		<groupId>org.apache.lucene</groupId>
-		<artifactId>lucene-wordnet</artifactId>
-		<version>3.3.0</version>
-	</dependency>
   </dependencies>
 
 	<build>
