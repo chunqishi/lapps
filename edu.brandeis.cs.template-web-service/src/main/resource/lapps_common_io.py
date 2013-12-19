@@ -257,15 +257,14 @@ class SectionConf(object):
             self.Return = self.ReturnConf.strip()
             
     def split(self):
-        self.splitArgs()
-        self.splitDumps()
-        self.splitLoads()
-        self.splitGlobals()
         self.splitRequires()
+        self.splitArgs()
+        self.splitLoads()
+        self.splitGlobals()        
+        self.splitPythonFile()
         self.splitMethod()
         self.splitReturn()
-        self.splitPythonFile()
-        
+        self.splitDumps()
 
 
 
@@ -456,71 +455,6 @@ def dumpFromLine(line, pickleId):
     pickleDefDump(_namePickleObj, pickleId)
     return _namePickleObj
 
-# 
-#     
-# def runPythonSection(_moduleConf, _loadConf, _globalConf, _funcConf, _argsConf, _returnConf, _dumpConf):
-#     '''  configuration Python section '''
-#     ''' load module '''
-# #    _moduleConf = getConf(pySectionName, CON_PYTHON_SECTION_FILE)
-#     if not _moduleConf == None:
-#         _module = loadModule(_moduleConf)
-#         _globalModule = sys.modules[__name__]
-#         _objNames = []
-#         _gobjNames = []
-# #        _module = loadModuleAs(_moduleConf, pySectionName)
-#         ''' read pick load '''
-# #        _loadConf = getConf(pySectionName, CON_PYTHON_SECTION_LOADS)
-#         if not _loadConf == None: 
-#             _loads = _loadConf.split(CONF_PYTHON_SECTION_LOADS_SEPARATOR)
-#             for _load in _loads:
-#                 if CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR in _load:
-#                     _picklePair = _load.split(CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR)
-#                     _objName = _picklePair[0].strip()
-#                     _pickleId = _picklePair[1].strip()            
-#                     _namePickleObj = loadToAttr(_globalModule, _objName, _pickleId)
-#                     _gobjNames.append(_objName)
-#         ''' set global variables '''
-# #        _globalConf = getConf(pySectionName, CON_PYTHON_SECTION_GLOBALS)
-#         if not _globalConf == None:            
-#             _globals = _globalConf.split(CONF_PYTHON_SECTION_GLOBALS_SEPARATOR)
-#             for _global in _globals:
-#                 if CONF_PYTHON_SECTION_GLOBALS_SETATTR_SEPARATOR in _global:
-#                     _globalPair = _global.split(CONF_PYTHON_SECTION_GLOBALS_SETATTR_SEPARATOR)
-#                     _gobjName = _globalPair[0].strip()
-#                     _gobjRef = _globalPair[1].strip()      
-#                     _nameGObj = eval(_gobjRef)
-#                     setattr(_module, _gobjName, _nameGObj)
-#                     _objNames.append(_gobjName)                    
-#         ''' configured function '''        
-# #        _funcConf = getConf(pySectionName, CON_PYTHON_SECTION_FUNC)
-#         if not _funcConf == None: 
-# #            _argsConf = getConf(pySectionName, CON_PYTHON_SECTION_ARGS)
-#             if _argsConf == None:
-#                  _argsConf = ""
-#             _return = runModuleFuncArgsLine(_module, _funcConf, _argsConf)
-# #            _returnConf = getConf(pySectionName, CON_PYTHON_SECTION_RETURN)
-#             if not _returnConf == None: 
-#                 setattr(_globalModule, _returnConf, _return)
-#                 _gobjNames.append(_returnConf)
-#     ''' write pickle dump '''              
-# #    _dumpConf = getConf(pySectionName, CON_PYTHON_SECTION_DUMPS)
-#     if not _dumpConf == None: 
-#         _dumps = _dumpConf.split(CONF_PYTHON_SECTION_LOADS_SEPARATOR)
-#         for _dump in _dumps:
-#             if CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR in _dump:
-#                 _picklePair = _dump.split(CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR)
-#                 _objName = _picklePair[0].strip()
-#                 _pickleId = _picklePair[1].strip()
-#                 dumpFromLine(_objName, _pickleId)
-#     ''' clean attributes '''
-#     if not _moduleConf == None:        
-#         for _objName in _objNames:
-#             delattr(_module, _objName)
-#         for _gobjName in _gobjNames:
-#             delattr(_globalModule, _gobjName)   
-#         if not _funcConf == None:      
-#             return _return
-
 class SectionRun(object):
     def __init__(self):
         self.sectionConf = SectionConf()
@@ -618,36 +552,6 @@ class SectionRun(object):
             rets.append(ret)
         return rets
 
-#
-# @brief:   read all the configuration from configuration. 
-#
-# def runPythonSectionConf(pySectionName):
-#     _requiresConf = getConf(pySectionName, CON_PYTHON_SECTION_REQUIRES)
-#     _moduleConf = getConf(pySectionName, CON_PYTHON_SECTION_FILE)
-#     _loadConf = getConf(pySectionName, CON_PYTHON_SECTION_LOADS)
-#     _globalConf = getConf(pySectionName, CON_PYTHON_SECTION_GLOBALS)
-#     _funcConf = getConf(pySectionName, CON_PYTHON_SECTION_FUNC)
-#     _argsConf = getConf(pySectionName, CON_PYTHON_SECTION_ARGS)
-#     _returnConf = getConf(pySectionName, CON_PYTHON_SECTION_RETURN)
-#     _dumpConf = getConf(pySectionName, CON_PYTHON_SECTION_DUMPS)
-#     ''' load required sections '''
-# #    _requiresConf = getConf(pySectionName, CON_PYTHON_SECTION_REQUIRES)    
-#     if not _requiresConf == None: 
-#         _requires = _requiresConf.split(CONF_PYTHON_SECTION_REQUIRES_SEPARATOR)
-#         _returnRequires = []
-#         for _require in _requires:
-#             _required = _require.strip()
-#             if len(_required) > 0:
-#                 _returnRequire = runPythonSectionConf(_required)    
-#                 _returnRequires.append(_returnRequire)
-#     ''' running Python Section '''            
-#     _return = runPythonSection(_moduleConf, _loadConf, _globalConf, _funcConf, _argsConf, _returnConf, _dumpConf)
-#     if not _return == None:
-#         return _return
-#     ''' if has required sections '''
-#     if not _requiresConf == None:          
-#         return _returnRequires
-
 def runPythonSectionConf(pySectionName):
     secRun = SectionRun()
     secRun.readSectionConf(pySectionName)
@@ -676,32 +580,6 @@ def runPythonSection(moduleConf, loadConf, globalConf, funcConf, argsConf, retur
     secRun.sectionConf = sectionConf
     ret = secRun.run()
     return ret
-
-
-# def runPythonSectionConfArgs(pySectionName,_moduleConf, _argsConf):
-#     _requiresConf = getConf(pySectionName, CON_PYTHON_SECTION_REQUIRES)
-#     _loadConf = getConf(pySectionName, CON_PYTHON_SECTION_LOADS)
-#     _globalConf = getConf(pySectionName, CON_PYTHON_SECTION_GLOBALS)
-#     _funcConf = getConf(pySectionName, CON_PYTHON_SECTION_FUNC)
-#     _returnConf = getConf(pySectionName, CON_PYTHON_SECTION_RETURN)
-#     _dumpConf = getConf(pySectionName, CON_PYTHON_SECTION_DUMPS)
-#     ''' load required sections '''
-# #    _requiresConf = getConf(pySectionName, CON_PYTHON_SECTION_REQUIRES)    
-#     if not _requiresConf == None: 
-#         _requires = _requiresConf.split(CONF_PYTHON_SECTION_REQUIRES_SEPARATOR)
-#         _returnRequires = []
-#         for _require in _requires:
-#             _required = _require.strip()
-#             if len(_required) > 0:
-#                 _returnRequire = runPythonSectionConf(_required)    
-#                 _returnRequires.append(_returnRequire)
-#     ''' running Python Section '''            
-#     _return = runPythonSection(_moduleConf, _loadConf, _globalConf, _funcConf, _argsConf, _returnConf, _dumpConf)
-#     if not _return == None:
-#         return _return
-#     ''' if has required sections '''
-#     if not _requiresConf == None:          
-#         return _returnRequires
 
 
 def main():        
