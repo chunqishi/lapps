@@ -178,6 +178,7 @@ public class PythonRunner {
 		}
 		
 		String module = getSectionProperty(section, CONF_PYTHON_SECTION_FILE);
+//		System.out.println("runPythonSection():module=" + module);
 		String args = getSectionProperty(section, CONF_PYTHON_SECTION_ARGS);		
 		String pythonFileConf = getDefProperty(CONF_PYTHON_FILE);		
 		String pythonFile = FileLoadUtil.locate(pythonFileConf).getAbsolutePath();

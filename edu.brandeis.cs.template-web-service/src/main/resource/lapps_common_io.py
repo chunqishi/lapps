@@ -366,7 +366,7 @@ class CommonIOConf(object):
             if not os.path.isabs(_directory):
                 _directory = os.path.join(directory(), self.PICKLE_DIR)
         self.PICKLE_DIR = _directory
-        self.setConfDef(CON_PICKLE_PATH, _directory)
+#         self.setConfDef(CON_PICKLE_PATH, _directory)
         if self.LOGWIRE:                
             log.debug("pickleDefDump: directory=%s", _directory)
         return _directory
