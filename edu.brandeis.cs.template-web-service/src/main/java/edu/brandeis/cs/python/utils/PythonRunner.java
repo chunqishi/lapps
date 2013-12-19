@@ -19,6 +19,8 @@ public class PythonRunner {
 	public static final String CONF_FILE = "lapps.conf";
 	public static final String CONF_PYTHON_FILE = "ConfigurationPython";
 	
+	public static final String ESCAPE_MARK_QUOTATION = "\"";
+	public static final String ESCAPE_MARK_SINGLE_QUOTATION = "'";	
 	
 	public static final String CONF_SECTION_DEFAULT = "default";
 	public static final String CONF_PICKLE_PATH = "PickleHome";
@@ -121,9 +123,10 @@ public class PythonRunner {
 	        }
 	        while ((st = stdError.readLine()) != null) {
 	            System.err.println(st);            
-	        }        
+	        }       
+	        p.waitFor();
 	        p.destroy();
-        }catch(IOException e){
+        }catch(Exception e){
         	e.printStackTrace();
         	throw new PythonRunnerException(e);
         }
@@ -175,6 +178,7 @@ public class PythonRunner {
 		}
 		
 		String module = getSectionProperty(section, CONF_PYTHON_SECTION_FILE);
+		System.out.println("runPythonSection():module=" + module);
 		String args = getSectionProperty(section, CONF_PYTHON_SECTION_ARGS);		
 		String pythonFileConf = getDefProperty(CONF_PYTHON_FILE);		
 		String pythonFile = FileLoadUtil.locate(pythonFileConf).getAbsolutePath();
@@ -187,9 +191,7 @@ public class PythonRunner {
 		
 		return runPython(pythonFile, "-i", section, module, args);
 	}
-	
-	public static final String ESCAPE_MARK_QUOTATION = "\"";
-	public static final String ESCAPE_MARK_SINGLE_QUOTATION = "'";
+
 	
 	public static final String escapePyParam(String arg){
 		arg = arg.trim();

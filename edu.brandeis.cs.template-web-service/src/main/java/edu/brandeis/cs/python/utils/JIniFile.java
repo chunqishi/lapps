@@ -128,8 +128,9 @@ private File userFileName;
   public String ReadString(String Section, String key, String defaultValue) {
     String value=defaultValue;
     if (ValuePosition(Section, key) > 0) {
-      int strLen = key.length()+1;
-      value = get(ValuePosition(Section, key)).toString().substring(strLen, get(ValuePosition(Section, key)).toString().length());
+      String line = get(ValuePosition(Section, key)).toString().trim();
+      int strLen = line.indexOf("=");
+      value = line.substring(strLen + 1).trim();
     }
     return value;
   }
@@ -178,10 +179,9 @@ private File userFileName;
 */
   public int ReadInteger(String Section, String key, int defaultValue) {
     int value=defaultValue;
-    if (ValuePosition(Section, key) > 0) {
-      int strLen = key.length()+1;
-      value = Integer.parseInt(get(ValuePosition(Section, key)).toString().substring(strLen, get(ValuePosition(Section, key)).toString().length()));
-    }
+    String v = ReadString(Section, key, null);
+    if (v != null)
+    	value = Integer.parseInt(v); 
     return value;
   }
   
@@ -203,10 +203,10 @@ private File userFileName;
   public Float ReadFloat(String Section, String key, Float defaultValue) {
     Float value = new Float(0f);
     value = defaultValue;
-    if (ValuePosition(Section, key) > 0) {
-      int strLen = key.length()+1;
-      value = Float.valueOf(get(ValuePosition(Section, key)).toString().substring(strLen, get(ValuePosition(Section, key)).toString().length()));
-    }
+    
+    String v = ReadString(Section, key, null);
+    if (v != null)
+    	value = Float.valueOf(v); 
     return value;
   }
   
@@ -227,10 +227,10 @@ private File userFileName;
 */
   public boolean ReadBool(String Section, String key, boolean defaultValue) {
     boolean value=defaultValue;
-    if (ValuePosition(Section, key) > 0) {
-      int strLen = key.length()+1;
-      value = Boolean.getBoolean(get(ValuePosition(Section, key)).toString().substring(strLen, get(ValuePosition(Section, key)).toString().length()));
-    }
+    
+    String v = ReadString(Section, key, null);
+    if (v != null)
+    	value = Boolean.getBoolean(v); 
     return value;
   }
   
@@ -386,7 +386,8 @@ private File userFileName;
     int strLen = key.length()+1;;
     for (int i=start+1; i < size(); i++) {
       s = get(i).toString();
-      if (s.startsWith(key+"=")) {
+//      if (s.startsWith(key+"=")) {
+      if (isKey(s, key)) {
         pos = i;
         break;
       } else if (s.startsWith("[") && s.endsWith("]")) {
@@ -394,6 +395,17 @@ private File userFileName;
       }
     }
     return pos;
+  }
+  
+  private static final boolean isKey(String line, String key) {
+	  if (line == null || key == null || !line.trim().startsWith(key.trim())) {
+		  return false;
+	  }
+	  key = key.trim();
+	  String sub = line.substring(line.indexOf(key) + key.length()).trim();
+	  if(sub.startsWith("="))
+		  return true;
+	  return false;
   }
   /**
 * Call DeleteKey to erase an INI file entry. Section is string containing the name
