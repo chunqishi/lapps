@@ -203,7 +203,6 @@ private File userFileName;
   public Float ReadFloat(String Section, String key, Float defaultValue) {
     Float value = new Float(0f);
     value = defaultValue;
-    
     String v = ReadString(Section, key, null);
     if (v != null)
     	value = Float.valueOf(v); 
@@ -227,7 +226,6 @@ private File userFileName;
 */
   public boolean ReadBool(String Section, String key, boolean defaultValue) {
     boolean value=defaultValue;
-    
     String v = ReadString(Section, key, null);
     if (v != null)
     	value = Boolean.getBoolean(v); 
