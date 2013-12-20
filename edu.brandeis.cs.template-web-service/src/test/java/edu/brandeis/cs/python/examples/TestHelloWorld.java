@@ -21,7 +21,7 @@ public class TestHelloWorld{
 	public void testSay() throws Exception{
 		HelloWorld hw = new HelloWorld();
 		String actual = hw.say("world");
-		String expect = "";
+		String expect = "hello Chunqi SHI";
 		String tips = "";
 		Assert.assertEquals(tips,expect, actual);
 		PythonRunner pr = new PythonRunner();

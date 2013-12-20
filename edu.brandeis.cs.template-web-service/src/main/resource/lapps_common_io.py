@@ -10,6 +10,7 @@ import cPickle as pickle
 import ConfigParser
 import logging
 
+import thread
 
 
 if sys.version_info < (2, 6):
@@ -20,7 +21,7 @@ if sys.version_info < (2, 6):
 #        CONSTANTS           #               
 ##  ##                  ##  ##    
 
-CON_VERSION = "0.02"
+CON_VERSION = "0.03"
 
 CON_SECTION_DEFAULT = "default"
 CON_PICKLE_PATH = "PickleHome"
@@ -34,11 +35,16 @@ CON_PYTHON_SECTION_RETURN = "Return"
 CON_PYTHON_SECTION_DUMPS = "Dumps"
 CON_PYTHON_SECTION_REQUIRES = "Requires"
 
+CON_PYTHON_SECTION_TYPE_WITHARGS = "SectionWithArgs"
+CON_PYTHON_SECTION_TYPE_REQUIRE = "SectionRequired"
+
+
 CONF_PYTHON_SECTION_REQUIRES_SEPARATOR = ","
 CONF_PYTHON_SECTION_GLOBALS_SEPARATOR = ","
 CONF_PYTHON_SECTION_GLOBALS_SETATTR_SEPARATOR = ":"
 CONF_PYTHON_SECTION_LOADS_SEPARATOR = ","
 CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR = ":"
+
 
 
 DEFAULT_CONF_FILE = "lapps.conf"
@@ -47,11 +53,8 @@ DEFAULT_PICKLE_SUFFIX = ".pkl"
 
 
 log = logging.getLogger("lapps_common_io")
-logging.basicConfig(filename='lapps_common_io.log', filemode='w', level=logging.DEBUG)
 
-class CommonIoError(Exception):
-    """Generic base of all lapps_common_io specific errors."""
-    pass
+
 ##
 #   @brief: return Python file's directory
 ##
@@ -59,12 +62,24 @@ def directory():
     py_file = inspect.getfile(inspect.currentframe())
     py_path = os.path.realpath(py_file)
     return os.path.dirname(py_path)
-
 def currDir():
     return os.path.realpath(os.getcwd())
-
 def home():    
     return os.path.dirname(directory()) 
+
+
+##
+#   @brief: debug logs
+##
+logfile = os.path.join(directory(), 'lapps_common_io.log')
+logging.basicConfig(filename='lapps_common_io.log', filemode='w', level=logging.DEBUG)
+
+##
+#   @brief: Exception Handler
+##
+class CommonIoError(Exception):
+    """Generic base of all lapps_common_io specific errors."""
+    pass
 
 
 ##
@@ -97,6 +112,19 @@ def getFileNames(directory, suffix):
     return filenames
 
 
+def threadFunc(fun, args, kwargs={}):
+    if config.LOGWIRE:
+        error = "threadFunc(): %s (%s) "  %func, ', '.join(args)  
+        log.debug(error)    
+    try:
+        thread.start_new_thread(fun,*args, **kwargs)
+    except Exception as errtxt:
+        if config.LOGWIRE:
+            error = "threadFunc(): func = %s " + errtxt %func 
+            log.error(error)
+        ''' directly running it again'''
+        fun(*args, **kwargs)
+        
 ##
 #    
 #    @brief:    use the pickleDump() and pickleLoad() functions. 
@@ -115,13 +143,20 @@ def pickleDump(data, path, pickleId):
     return pickleId
     
 def pickleLoad(path, pickleId):
+    data = None
     file = os.path.join(path, pickleId)
-    pkl_file = open(file, 'rb')
-    data = pickle.load(pkl_file)
-    pkl_file.close()
+    if os.path.exists(file):
+        pkl_file = open(file, 'rb')
+        data = pickle.load(pkl_file)
+        pkl_file.close()    
     return data
 
-
+##
+#    
+#    @brief:    split "conf" string using separator "sep" 
+#                
+#               
+##
 def split2array(conf, sep):
     if conf == None or conf.strip() == "":
         return []
@@ -155,7 +190,7 @@ class GlobalPair(object):
 #    
 ##
 class SectionConf(object):
-    __slots__=("Requires", "Loads", "PythonFile", "Globals", "Method", "Args", "Return", "Dumps",
+    __slots__=("Section", "Requires", "Loads", "PythonFile", "Globals", "Method", "Args", "Return", "Dumps",
                "RequiresConf", "LoadsConf", "PythonFileConf", "GlobalsConf", "MethodConf", "ArgsConf", "ReturnConf", "DumpsConf",
                "SECTION_LOADS_PICKLE_SEPARATOR",
                "SECTION_ARGS_SEPARATOR",  
@@ -164,9 +199,12 @@ class SectionConf(object):
                "SECTION_GLOBALS_SETATTR_SEPARATOR",
                "SECTION_DUMPS_SEPARATOR",
                "SECTION_DUMPS_PICKLE_SEPARATOR",
-               "SECTION_LOADS_SEPARATOR")
-        
-    def __init__(self):        
+               "SECTION_LOADS_SEPARATOR", 
+               "SectionType")
+    def __init__(self):
+        self.clear()            
+    def clear(self):        
+        self.Section = ""
         ''' section items '''
         self.Requires = []
         self.Loads = []
@@ -194,6 +232,15 @@ class SectionConf(object):
         self.SECTION_GLOBALS_SEPARATOR = ","
         self.SECTION_REQUIRES_SEPARATOR = ","
         self.SECTION_ARGS_SEPARATOR = ","
+        ''' section types '''
+        self.SectionType = CON_PYTHON_SECTION_TYPE_WITHARGS
+        
+    def typeReq(self):    
+        self.SectionType = CON_PYTHON_SECTION_TYPE_REQUIRE        
+    def typeArg(self):
+        self.SectionType = CON_PYTHON_SECTION_TYPE_WITHARGS
+    def isTypeReq(self):
+        return self.SectionType == CON_PYTHON_SECTION_TYPE_REQUIRE
         
     def asDict(self):
         result={}
@@ -208,26 +255,31 @@ class SectionConf(object):
         dict = self.asDict()
         for n in dict.iterkeys():
              result.append("%s = %s" % (n, dict.get(n)))
-        return "\n".join(result)
+        return "{\n\t\t"+"\n\t\t".join(result)+"\n}"
     
     def splitRequires(self):
-        self.Requires = split2array(self.RequiresConf, self.SECTION_REQUIRES_SEPARATOR) 
+        self.Requires =  []
+        for req in split2array(self.RequiresConf, self.SECTION_REQUIRES_SEPARATOR):
+            self.Requires.append(req.strip())  
         return self.Requires
     
     def splitArgs(self):
+        self.Args = []
         if not self.ArgsConf == None and not self.ArgsConf.strip() == "":
             self.ArgsConf = self.ArgsConf.strip()
         self.Args = split2array(self.ArgsConf, self.SECTION_ARGS_SEPARATOR) 
         return self.Args
     
     def splitGlobals(self):
+        self.Globals = []
         globalConfs = split2array(self.GlobalsConf, self.SECTION_GLOBALS_SEPARATOR)
         for globalConf in globalConfs:
-            glob = GlobalPair(globalConf.strip())
+            glob = GlobalPair(globalConf.strip(),self.SECTION_GLOBALS_SETATTR_SEPARATOR)
             self.Globals.append(glob)
         return self.Globals
     
     def splitLoads(self):
+        self.Loads = []
         loadConfs = split2array(self.LoadsConf, self.SECTION_LOADS_SEPARATOR)
         for loadConf in loadConfs:
             load = PicklePair(loadConf.strip(), self.SECTION_LOADS_PICKLE_SEPARATOR)
@@ -235,6 +287,7 @@ class SectionConf(object):
         return self.Loads
 
     def splitDumps(self):
+        self.Dumps = []
         dumpConfs = split2array(self.DumpsConf, self.SECTION_DUMPS_SEPARATOR)
         for dumpConf in dumpConfs:
             dump = PicklePair(dumpConf.strip(), self.SECTION_DUMPS_PICKLE_SEPARATOR)
@@ -255,18 +308,20 @@ class SectionConf(object):
     def splitReturn(self):
         if not self.ReturnConf == None and not self.ReturnConf.strip() == "":
             self.Return = self.ReturnConf.strip()
+        if config.LOGWIRE:
+            log.debug("SectionConf.splitReturn():self.Section=%s, self.Return=%s, self.ReturnConf=%s", self.Section, self.Return, self.ReturnConf)
             
-    def split(self):
+    def splitAll(self):
         self.splitRequires()
-        self.splitArgs()
         self.splitLoads()
-        self.splitGlobals()        
         self.splitPythonFile()
+        self.splitGlobals()
+        self.splitArgs()
         self.splitMethod()
         self.splitReturn()
         self.splitDumps()
 
-
+### @END class SectionConf(object):
 
 class CommonIOConf(object):
     ''' http://stackoverflow.com/questions/472000/python-slots '''
@@ -302,10 +357,12 @@ class CommonIOConf(object):
                 "Active configuration settings:"]   
         for n, v in sorted(config.items()):
             result.append("%s = %s" % (n, v))
-        return "\n".join(result)        
+        return "{\n\t\t"+"\n\t\t".join(result)+"\n}"        
     
     def _loadConf(self):
         _config_file = self.CONF_FILE
+        if self.LOGWIRE:                
+           log.debug("CommonIOConf._loadConf: _config_file=%s", _config_file)
         if not os.path.isabs(_config_file):
             if os.path.exists(os.path.join(directory(), self.CONF_FILE)):
                 _config_file = os.path.join(directory(), self.CONF_FILE)
@@ -315,7 +372,7 @@ class CommonIOConf(object):
                 _config_file = os.path.join(home(), self.CONF_FILE)
         if os.path.exists(_config_file):
             if self.LOGWIRE:                
-                log.debug("CommonIOConf._loadConf: CONF_FILE=%s", _config_file)
+                log.debug("CommonIOConf._loadConf: _config_file=%s", _config_file)
             self.config.read(_config_file)
             self.CONF_FILE = _config_file
             self.isConfLoaded = True
@@ -369,6 +426,8 @@ class CommonIOConf(object):
         if self.LOGWIRE:                
             log.debug("pickleDefDump: directory=%s", _directory)
         return _directory
+
+###  @End class CommonIOConf(object):
     
 ##
 #   @brief: dynamically load module from Python file.
@@ -406,13 +465,19 @@ def runModuleFunc(module, method, *args, **kwargs):
         return _callable(*args, **kwargs)
 
 def runModuleFuncArgsLine(module, method, argsline):
+    if config.LOGWIRE:
+        log.debug("runModuleFunc(%s, %s, %s)", module, method, argsline)
     return eval("runModuleFunc(module, '" + method + "', " + argsline + ")")
 
 
 config = CommonIOConf()
 
-def useConfig(_config):
-    config = _config
+def useConfigFile(configFile):
+    if config.LOGWIRE:
+        log.debug("configFile =  %s", configFile)
+    config.CONF_FILE = configFile
+    if config.LOGWIRE:
+        log.debug("config ::  %s", config.dump())
 
 ##
 #   @brief: call a Python file and run one function.
@@ -430,7 +495,7 @@ def runPythonFuncArgsLine(pyFile, method, argsline):
 def pickleDefDump(data, pickleId):
     _directory = config.picklePath()
     return pickleDump(data, _directory, pickleId + config.PICKLE_SUFFIX)    
-def pickleDefLoad(self, pickleId):
+def pickleDefLoad(pickleId):
     _directory = config.picklePath()        
     return pickleLoad(_directory, pickleId + config.PICKLE_SUFFIX)
 
@@ -464,6 +529,10 @@ class SectionRun(object):
         self.localObjs = []
          
     def readSectionConf(self, section):
+        if config.LOGWIRE :
+            log.debug("SectionRun.readSectionConf(): config :: %s", config.dump())
+        self.sectionConf.clear()
+        self.sectionConf.Section = section
         self.sectionConf.RequiresConf = config.getConf(section, CON_PYTHON_SECTION_REQUIRES)
         self.sectionConf.ArgsConf = config.getConf(section, CON_PYTHON_SECTION_ARGS)
         self.sectionConf.GlobalsConf = config.getConf(section, CON_PYTHON_SECTION_GLOBALS)  
@@ -472,8 +541,6 @@ class SectionRun(object):
         self.sectionConf.MethodConf = config.getConf(section, CON_PYTHON_SECTION_FUNC)
         self.sectionConf.ReturnConf = config.getConf(section, CON_PYTHON_SECTION_RETURN)
         self.sectionConf.DumpsConf = config.getConf(section, CON_PYTHON_SECTION_DUMPS)
-        if config.LOGWIRE :
-            log.debug("SectionRun.readSectionConf(): sectionConf :: %s", self.sectionConf.dump())
 
     def loads(self):
         self.sectionConf.splitLoads()
@@ -484,7 +551,7 @@ class SectionRun(object):
     def module(self):
         self.sectionConf.splitPythonFile()
         if config.LOGWIRE :
-            log.debug("SectionRun.module(): sectionConf.PythonFile=%s", self.sectionConf.PythonFile)
+            log.debug("SectionRun.module(): self.sectionConf.Section=%s, sectionConf.PythonFile=%s", self.sectionConf.Section, self.sectionConf.PythonFile)
         if not self.sectionConf.PythonFile == "":
             self.localModule = loadModule(self.sectionConf.PythonFile)
     
@@ -500,15 +567,15 @@ class SectionRun(object):
     
     def func(self):
         self.sectionConf.splitMethod()
-        if not self.sectionConf.Method == "":
-            self.sectionConf.splitArgs()
+        self.sectionConf.splitArgs()
+        self.sectionConf.splitReturn()
+        if not self.sectionConf.Method == "":            
             if self.localModule == None:
                 error = "local module has not been loaded."
                 raise CommonIoError(error)    
-            ret = runModuleFuncArgsLine(self.localModule, self.sectionConf.Method, self.sectionConf.ArgsConf)
+            ret = runModuleFuncArgsLine(self.localModule, self.sectionConf.Method, ",".join(self.sectionConf.Args))
 #            _returnConf = getConf(pySectionName, CON_PYTHON_SECTION_RETURN)
-            if not ret == None:
-                self.sectionConf.splitReturn()
+            if not ret == None:                
                 setattr(self.globalModuel, self.sectionConf.Return, ret)
                 self.globalObjs.append(self.sectionConf.Return) 
                 return ret
@@ -519,6 +586,26 @@ class SectionRun(object):
         for dump in self.sectionConf.Dumps:
             dumpFromLine(dump.objName, dump.pickleId)
  
+    def requires(self): 
+        self.sectionConf.splitRequires()
+        if config.LOGWIRE:
+            log.debug("SectionRun.requires(): self.sectionConf.Section=%s, self.sectionConf.Requires=%s", self.sectionConf.Section,",".join(self.sectionConf.Requires))
+        rets = []
+        for req in self.sectionConf.Requires:
+            secRun = SectionRun()
+            ''' set section type is required section '''            
+            secRun.readSectionConf(req)
+            secRun.sectionConf.typeReq()
+            ret = secRun.run()
+            if ret == None:
+                ret = str(None)
+            rets.append(ret)
+            if config.LOGWIRE:
+                log.debug("SectionRun.requires(): secRun.sectionConf.Section=%s, ret=%s", secRun.sectionConf.Section, ret)
+        if config.LOGWIRE:
+            log.debug("SectionRun.requires(): self.sectionConf.Section=%s, rets=%s", self.sectionConf.Section, ",".join(rets))
+        return rets
+
     def clear(self):
         for objName in self.localObjs:
             if self.localModule == None:
@@ -526,31 +613,57 @@ class SectionRun(object):
                 raise CommonIoError(error)    
             delattr(self.localModule, objName)
         for gobjName in self.globalObjs:
-            delattr(self.globalModuel, gobjName)   
-        
+            delattr(self.globalModuel, gobjName)
+        self.sectionConf.clear()
+        self.localObjs = []
+        self.globalObjs = []
+        self.localModule = None
+           
+    
     def run(self):
+        self.sectionConf.splitAll()
+        if config.LOGWIRE :
+            log.debug("SectionRun.run(): self.sectionConf.Section=%s, sectionConf :: %s", self.sectionConf.Section, self.sectionConf.dump())
+        ''' if section type is required [isTypeReq() == true], and has dumped result, just skip running and return the dumped result. '''
+        if config.LOGWIRE:
+            log.debug("SectionRun.run(): self.sectionConf.Section=%s,  self.sectionConf.SectionType=%s, ",  self.sectionConf.Section, self.sectionConf.SectionType)
+        if self.sectionConf.isTypeReq():
+            if config.LOGWIRE:
+                log.debug("SectionRun.run(): self.sectionConf.Section=%s, self.sectionConf.Return=%s", self.sectionConf.Section, self.sectionConf.Return)
+            ''' return exists '''
+            if not self.sectionConf.Return == None and not self.sectionConf.Return == "":                
+                ''' and this return is dumped '''
+                for dump in self.sectionConf.Dumps:
+                    if config.LOGWIRE:
+                        log.debug("SectionRun.run(): self.sectionConf.Section=%s, dump.objName=%s", self.sectionConf.Section, dump.objName)
+                    if dump.objName == self.sectionConf.Return:
+                        obj = pickleDefLoad(dump.pickleId)
+                        ''' and dump exists '''
+                        if not obj == None:                            
+                            if config.LOGWIRE:
+                                log.debug("SectionRun.run(): self.sectionConf.Section=%s, dump.objName=%s, obj=%s, directly return results", self.sectionConf.Section, dump.objName, obj)
+#                             self.clear()
+                            return obj  
+        if config.LOGWIRE:
+            log.debug("----------------------------START-----------------------------")
         reqRets = self.requires()
         self.loads()
         self.module()
         self.globals()
         ret = self.func()
-        self.dumps()
-        self.clear()
+        self.dumps()        
+        if config.LOGWIRE:
+            log.debug("Section = %s run success! ret=%s, reqRets=%s", self.sectionConf.Section, ret, ",".join(reqRets))
+        if config.LOGWIRE:
+            log.debug("----------------------------END--------------------------------")    
+#         self.clear()
         if not ret == None:
             return ret
         if not reqRets == []:
             return reqRets
         return None
-            
-    def requires(self):
-        self.sectionConf.splitRequires()
-        rets = []
-        for req in self.sectionConf.Requires:
-            secRun = SectionRun()
-            secRun.readSectionConf(req)
-            ret = secRun.run()
-            rets.append(ret)
-        return rets
+
+###  @End class SectionRun(object):
 
 def runPythonSectionConf(pySectionName):
     secRun = SectionRun()
