@@ -112,18 +112,18 @@ def getFileNames(directory, suffix):
     return filenames
 
 
-def threadFunc(fun, args, kwargs={}):
+def threadFunc(func, args, kwargs={}):
     if config.LOGWIRE:
         error = "threadFunc(): %s (%s) "  %func, ', '.join(args)  
         log.debug(error)    
     try:
-        thread.start_new_thread(fun,*args, **kwargs)
+        thread.start_new_thread(func,*args, **kwargs)
     except Exception as errtxt:
         if config.LOGWIRE:
             error = "threadFunc(): func = %s " + errtxt %func 
             log.error(error)
         ''' directly running it again'''
-        fun(*args, **kwargs)
+        func(*args, **kwargs)
         
 ##
 #    
