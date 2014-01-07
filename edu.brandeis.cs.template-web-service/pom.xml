@@ -7,7 +7,43 @@
   <name>Web Services wrapping TEMPLATE tools</name>
   <description>Publish API for the LAPPS exchange data structure (LEDS), the thing that will be serialized to from JSON-LD.
 
-Provide converter for the OpenNLP one-per-line format to LEDS.</description>
+	Provide converter for the OpenNLP one-per-line format to LEDS.
+  </description>
+  
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>central</id>
+      <name>libs-releases</name>
+      <url>http://maven.ceon.pl/artifactory/libs-releases</url>
+    </repository>
+    <repository>
+      <snapshots />
+      <id>snapshots</id>
+      <name>libs-snapshots</name>
+      <url>http://maven.ceon.pl/artifactory/libs-snapshots</url>
+    </repository>
+  </repositories>
+  <pluginRepositories>
+    <pluginRepository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>central</id>
+      <name>plugins-releases</name>
+      <url>http://maven.ceon.pl/artifactory/plugins-releases</url>
+    </pluginRepository>
+    <pluginRepository>
+      <snapshots />
+      <id>snapshots</id>
+      <name>plugins-snapshots</name>
+      <url>http://maven.ceon.pl/artifactory/plugins-snapshots</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+  
   <dependencies>
   	<dependency>
   		<groupId>junit</groupId>
@@ -54,6 +90,12 @@ Provide converter for the OpenNLP one-per-line format to LEDS.</description>
 		<artifactId>slf4j-api</artifactId>
 		<version>1.7.5</version>
 	</dependency>	
+    <dependency>
+		<groupId>pyrolite</groupId>
+		<artifactId>pyrolite</artifactId>
+		<version>0.0.20111030</version>
+	</dependency>	
+
   </dependencies>
 
 	<build>

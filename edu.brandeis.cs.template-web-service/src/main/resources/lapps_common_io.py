@@ -678,8 +678,8 @@ class SectionRun(object):
 def runPythonSectionConf(pySectionName):
     secRun = SectionRun()
     secRun.readSectionConf(pySectionName)
-    secRun.run()
-    ret = secRun.ret()
+    ret = secRun.run()
+#     ret = secRun.ret()
     return ret
 
 
@@ -688,8 +688,8 @@ def runPythonSectionConfArgs(pySectionName, moduleConf, argsConf):
     secRun.readSectionConf(pySectionName)
     secRun.sectionConf.PythonFileConf = moduleConf
     secRun.sectionConf.ArgsConf = argsConf
-    secRun.run()
-    ret = secRun.ret()
+    ret = secRun.run()
+#     ret = secRun.ret()
     return ret
 
 def runPythonSection(moduleConf, loadConf, globalConf, funcConf, argsConf, returnConf, dumpConf):
@@ -703,8 +703,8 @@ def runPythonSection(moduleConf, loadConf, globalConf, funcConf, argsConf, retur
     sectionConf.DumpsConf = dumpConf
     secRun = SectionRun()
     secRun.sectionConf = sectionConf
-    secRun.run()
-    ret = secRun.ret()
+    ret = secRun.run()
+#     ret = secRun.ret()
     return ret
 
 
