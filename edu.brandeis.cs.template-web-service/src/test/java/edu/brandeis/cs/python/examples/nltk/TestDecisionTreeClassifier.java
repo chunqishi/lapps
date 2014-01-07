@@ -17,12 +17,19 @@ public class TestDecisionTreeClassifier{
 		dtc = new DecisionTreeClassifier();
 	}
 	
+//	@Test
+//	public void testTrain() throws Exception{
+//		String actual = dtc.train("features_brown_news");
+//		String expect = "";
+//		String tips = "";
+//		Assert.assertEquals(tips, expect, actual);
+//	}
+	
 	@Test
-	public void testSay() throws Exception{
-		String actual = dtc.train("features_brown_news");
-		String expect = "";
-		String tips = "";
+	public void testPredict() throws Exception{
+		String actual = dtc.predict("features_brown_news", "boy");
+		String expect = "IN";
+		String tips = "Boy has wrong tagger";
 		Assert.assertEquals(tips, expect, actual);
 	}
-
 }

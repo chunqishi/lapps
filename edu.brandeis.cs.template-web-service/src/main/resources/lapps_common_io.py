@@ -21,7 +21,7 @@ if sys.version_info < (2, 6):
 #        CONSTANTS           #               
 ##  ##                  ##  ##    
 
-CON_VERSION = "0.03"
+CON_VERSION = "0.04"
 
 CON_SECTION_DEFAULT = "default"
 CON_PICKLE_PATH = "PickleHome"
@@ -666,13 +666,20 @@ class SectionRun(object):
         if not reqRets == []:
             return reqRets
         return None
-
+    
+    def ret(self):
+        r = ""
+        if not self.sectionConf.Return == "":
+            r = eval(self.sectionConf.Return)
+        return r
+    
 ###  @End class SectionRun(object):
 
 def runPythonSectionConf(pySectionName):
     secRun = SectionRun()
     secRun.readSectionConf(pySectionName)
-    ret = secRun.run()
+    secRun.run()
+    ret = secRun.ret()
     return ret
 
 
@@ -681,7 +688,8 @@ def runPythonSectionConfArgs(pySectionName, moduleConf, argsConf):
     secRun.readSectionConf(pySectionName)
     secRun.sectionConf.PythonFileConf = moduleConf
     secRun.sectionConf.ArgsConf = argsConf
-    ret = secRun.run()
+    secRun.run()
+    ret = secRun.ret()
     return ret
 
 def runPythonSection(moduleConf, loadConf, globalConf, funcConf, argsConf, returnConf, dumpConf):
@@ -695,7 +703,8 @@ def runPythonSection(moduleConf, loadConf, globalConf, funcConf, argsConf, retur
     sectionConf.DumpsConf = dumpConf
     secRun = SectionRun()
     secRun.sectionConf = sectionConf
-    ret = secRun.run()
+    secRun.run()
+    ret = secRun.ret()
     return ret
 
 

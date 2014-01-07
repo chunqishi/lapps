@@ -23,8 +23,8 @@ MAX_FEATURESET_LEN = 200
 ##
 #    @brief:    predict needs trained classifier module, feature extractor, and input
 ##
-def predict(classifier, featureExtractorFunc,  input):
-    return classifier.classify(featureExtractorFunc(input))
+def predict(classifier, input):
+    return classifier.classify(pos_features(input))
 
 def get_common_suffixes():
     suffix_fdist = nltk.FreqDist()

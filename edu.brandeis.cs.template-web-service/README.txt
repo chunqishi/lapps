@@ -1,8 +1,25 @@
 
+
 ############################################################################################################
 
 
 
+
+
+############################################################################################################
+Jan 7, 2014
+
+Lapps Common IO (for Python) Version 0.03
+
+DONE:
+1. provide Java (edu.brandeis.cs.python.utils.PythonRunner) integration
+   1) Allows replacement of parameters
+   2) Allows reference of global variable
+   
+TODO:
+1. Provide Java pickle access
+2. Provide Pyro4 interface
+   
 
 
 ############################################################################################################

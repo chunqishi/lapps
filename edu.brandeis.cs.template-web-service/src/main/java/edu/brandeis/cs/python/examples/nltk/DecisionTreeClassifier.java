@@ -22,8 +22,8 @@ public class DecisionTreeClassifier implements IClassify {
 	}
 	@Override
 	public String train(String featuresID) throws PythonRunnerException {
-		String ret = pr.runPythonSection("edu.brandeis.cs.python.examples.nltk.DecisionTreeClassifier.train", featuresID);
-		return ret;
+		pr.runPythonSection("edu.brandeis.cs.python.examples.nltk.DecisionTreeClassifier.train", featuresID);
+		return featuresID;
 	}
 
 	@Override
