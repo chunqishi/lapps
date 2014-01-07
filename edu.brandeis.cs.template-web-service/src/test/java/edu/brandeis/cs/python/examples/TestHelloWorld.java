@@ -1,5 +1,9 @@
 package edu.brandeis.cs.python.examples;
 
+import java.io.File;
+
+import org.apache.commons.io.FileUtils;
+import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,22 +14,41 @@ public class TestHelloWorld{
 	
 	
 	private HelloWorld hw = null;
-	
+	File conf = new File("TestHelloWorld.conf");
 
 	@Before
 	public void setUp() throws Exception {		
-		hw = new HelloWorld();
+		String data = "## \n"+
+					"# @file:        lapps.conf\n"+
+					"# @brief:        configure file for Python interfaces\n"+
+					"##\n"+
+					
+					"[default]\n"+
+					"ConfigurationPython = lapps_java_cmd.py\n"+
+					"PickleHome =\n"+
+					
+					"[edu.brandeis.cs.python.examples.HelloWorld]\n"+ 
+					"PythonFile=examples/helloworld.py \n"+
+					"Globals=hello:\"hi\" \n"+
+					"Method=say \n"+
+					"Args=%%1\n";
+							
+		FileUtils.writeStringToFile(conf, data, "UTF-8");
+		PythonRunner pr = new PythonRunner(conf.getCanonicalPath());
+		hw = new HelloWorld(pr);
 	}
 	
 	@Test
-	public void testSay() throws Exception{
-		HelloWorld hw = new HelloWorld();
+	public void testSay() throws Exception{		
 		String actual = hw.say("world");
-		String expect = "hello Chunqi SHI";
+		String expect = "hi world";
 		String tips = "";
-		Assert.assertEquals(tips,expect, actual);
-		PythonRunner pr = new PythonRunner();
-		String s = pr.runPythonSection("helloworld.append", "hello", "world");
+		Assert.assertEquals(tips, expect, actual);
+	}
+	
+	@After
+	public void tear() throws Exception{
+		conf.deleteOnExit();
 	}
 
 }

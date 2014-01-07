@@ -32,7 +32,8 @@ public class FileLoadUtil {
 			if (resURL != null)
 				resFile = new File(resURL.toURI());
 			// System.out.println(checksumSHA1(resFile));
-			// System.out.println(resFile);
+//			System.out.println(resource);
+//			System.out.println(resFile);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

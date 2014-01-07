@@ -187,6 +187,7 @@ public class PythonRunner {
 		// parameters replacements.
 		for(int i = 0; i < arrParams.length; i++){
 			args = args.replace("%%"+(i+1), escapePyParam(arrParams[i]));
+			args = args.replace("&&"+(i+1), arrParams[i]);
 		}
 		
 		return runPython(pythonFile, "-i", section, module, args);
