@@ -46,7 +46,7 @@ def pos_features(inputWord):
 
 def features_brown_news():
     tagged_words = brown.tagged_words(categories='news')
-    featuresets = [(pos_features(common_suffixes, n), g) for (n,g) in tagged_words]
+    featuresets = [(pos_features(n), g) for (n,g) in tagged_words]
     return featuresets
 
 
