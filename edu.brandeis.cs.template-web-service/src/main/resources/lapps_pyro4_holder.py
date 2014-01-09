@@ -9,7 +9,7 @@
 #   @ref:   http://code.activestate.com/recipes/278731/
 ##
 
-import sys, os, time, atexit, re, subprocess
+import sys, os, time, atexit, re, subprocess, inspect
 from signal import SIGTERM
 import Pyro4
 import socket
@@ -18,7 +18,17 @@ import sys
 import Pyro4.core
 import Pyro4.naming
 
-from lapps_common_io import directory
+##
+#   @brief: return Python file's directory
+##
+def directory():    
+    py_file = inspect.getfile(inspect.currentframe())
+    py_path = os.path.realpath(py_file)
+    return os.path.dirname(py_path)
+def currDir():
+    return os.path.realpath(os.getcwd())
+def home():    
+    return os.path.dirname(directory()) 
 
 ### Pyro configuration, we set the server type here.
 ##
@@ -140,6 +150,10 @@ class Daemon(object):
             for x in s.stdout:
                 if re.search(pid, x):
                     return True
+                
+            # If pid not running.    
+            if os.path.exists(self.pidfile):
+                os.remove(self.pidfile)    
             return False
 
 
@@ -269,18 +283,28 @@ class HolderServer(Daemon):
 
 ## End of HolderServer
 
-
-def push():
-    holder = Pyro4.core.Proxy("PYRONAME:" + Holder.nameSpace())
-    holder.put("key",["value1","value2"])
-    pass
-
-	
-def main():
+# if NOT running, then start.
+def start():
     hs = HolderServer()
-    hs.start()
-    push()
+    if not hs.status():
+        hs.start()
+
+def put(key, val):
+    # if HolderServer not running
+    start()
+    # Put (key, val)    
+    holder = Pyro4.core.Proxy("PYRONAME:" + Holder.nameSpace())
+    holder.put(key,val)    
+
+def get(key):
+    val = None
+    try:
+        # Get key 
+        holder = Pyro4.core.Proxy("PYRONAME:" + Holder.nameSpace())
+        val = holder.get(key)
+    except Exception:
+        val = None
+    return val
 
 if __name__ == "__main__":
-    main()
-		
+    start()
