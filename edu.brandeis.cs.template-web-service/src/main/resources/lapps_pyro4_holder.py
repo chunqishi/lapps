@@ -8,52 +8,34 @@
 
 import Pyro4
 
-DEFAULT_HOLDER_NAME = "Holder"
+DEFAULT_HOLDER_NAME = "PYRONAME:Holder"
 
 Pyro4.config.COMPRESSION = True
+Pyro4.config.SERIALIZER = 'pickle'
+Pyro4.config.SERIALIZERS_ACCEPTED.add('pickle')
 
 class Holder(object):
     def __init__(self):        self.data = {}
-    	self.running = False
-    	self.daemon = Pyro4.Daemon()
-    	self.uri = self.daemon.register(self)  
    
     def put(self, key, value):
         self.data[key] = value
+        print "key="+key
         return value 
         
     def get(self, key):
+        print "key="+key
         return self.data[key]
         
-    def getUri(self):
-        return self.uri
-        
     @staticmethod
-    def nameSpace():    	return "PYRONAME:" + DEFAULT_HOLDER_NAME
+    def nameSpace():    	return DEFAULT_HOLDER_NAME
     
-    def isRunning(self):    	return self.running
-		
-    def loop(self):
-    	self.running = True
-#    	Pyro4.locateNS().register(DEFAULT_HOLDER_NAME, self.uri)
-    	self.daemon.requestLoop(loopCondition=self.isRunning)
-    	self.running =  False
-    
-    def stop(self):
-        self.isRunning = False
-        	
     def len(self):
     	return len(self.data)
 		
-def start():	
-#    Pyro4.config.COMMTIMEOUT = 1
-#    Pyro4.naming.startNSloop()
+def start():
     holder = Holder()
-    print holder.getUri()    
-    holder.loop()	
+    Pyro4.Daemon.serveSimple( { holder: holder.nameSpace() }, ns = True)
 
-def getHolderUri(uri):    holder = Pyro4.Proxy(uri)
-    return holder
 def getHolder():
     holder = Pyro4.Proxy(Holder.nameSpace())
     return holder
