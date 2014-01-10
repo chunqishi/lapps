@@ -149,24 +149,30 @@ public class PythonRunner {
         return result.toString();
 	}
 	
-	public String runPythonSection(String [] args) throws PythonRunnerException {
-		File confFile = FileLoadUtil.locate(confPath);
-		try {
-			if (FileLoadUtil.needUpdate(confFile)){
-				init(confFile.getAbsolutePath());
-			}
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
-			throw new PythonRunnerException(e);
-		} catch (IOException e) {
-			e.printStackTrace();
-			throw new PythonRunnerException(e);
-		}
-		
-		String pythonFileConf = getDefProperty(CONF_PYTHON_FILE);		
-		String pythonFile = FileLoadUtil.locate(pythonFileConf).getAbsolutePath();
-		return runPython(pythonFile, args);
-	}
+//	/**
+//	 * Run Python section, with string arguments 
+//	 * @param args
+//	 * @return
+//	 * @throws PythonRunnerException
+//	 */
+//	public String runPythonSection(String [] args) throws PythonRunnerException {
+//		File confFile = FileLoadUtil.locate(confPath);
+//		try {
+//			if (FileLoadUtil.needUpdate(confFile)){
+//				init(confFile.getAbsolutePath());
+//			}
+//		} catch (NoSuchAlgorithmException e) {
+//			e.printStackTrace();
+//			throw new PythonRunnerException(e);
+//		} catch (IOException e) {
+//			e.printStackTrace();
+//			throw new PythonRunnerException(e);
+//		}
+//		
+//		String pythonFileConf = getDefProperty(CONF_PYTHON_FILE);		
+//		String pythonFile = FileLoadUtil.locate(pythonFileConf).getAbsolutePath();
+//		return runPython(pythonFile, args);
+//	}
 	
 	public String getDefProperty(String key){
 		return getSectionProperty(CONF_SECTION_DEFAULT, key);
@@ -190,14 +196,20 @@ public class PythonRunner {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		
+		// read target python file
 		String module = getSectionProperty(section, CONF_PYTHON_SECTION_FILE);
-//		System.out.println("runPythonSection():module=" + module);
-		String args = getSectionProperty(section, CONF_PYTHON_SECTION_ARGS);		
+		module = FileLoadUtil.locate(module).getAbsolutePath();
+		
+		// read parameter configurations
+		String args = getSectionProperty(section, CONF_PYTHON_SECTION_ARGS);
+		
+		// read python command interface
 		String pythonFileConf = getDefProperty(CONF_PYTHON_FILE);		
 		String pythonFile = FileLoadUtil.locate(pythonFileConf).getAbsolutePath();
 		
-		module = FileLoadUtil.locate(module).getAbsolutePath();
+		
+//		System.out.println("runPythonSection():module=" + module);
+		
 		// parameters replacements.
 		for(int i = 0; i < arrParams.length; i++){
 			args = args.replace("%%"+(i+1), escapePyParam(arrParams[i]));
@@ -207,14 +219,18 @@ public class PythonRunner {
 		return runPython(pythonFile, "-i", section, module, args);
 	}
 	
-	public Object runPythonPyro4Holder(String section, Object ... arrParams) throws PythonRunnerException {
+	public Object runPythonSectionPyro4(String section, Object ... arrParams) throws PythonRunnerException {
+		// provide function running sockets key
 		String key = section + ":" + System.currentTimeMillis();
 		try {
+			// create a new connection for pyro4holder.
 			Pyro4Holder holder = new Pyro4Holder();
+			// push all the parameters into sockets 
 			holder.put(key, arrParams);
 			
 			// runPythonSection
-			
+
+			// read the return value from the sockets.
 			Object obj = holder.get(key);
 			return obj;
 		} catch(IOException e) {

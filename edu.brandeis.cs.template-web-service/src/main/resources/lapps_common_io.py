@@ -12,6 +12,7 @@ import logging
 
 import thread
 
+from lapps_pyro4_holder import put, get
 
 if sys.version_info < (2, 6):
     import warnings
@@ -391,6 +392,9 @@ class CommonIOConf(object):
         try:   
             _value = self.config.get(section, key)
         except ConfigParser.NoSectionError:
+            error = "section %s NOT exist" % section
+            raise CommonIoError(error)    
+ 
             _value = None
         except ConfigParser.NoOptionError:  
             _value = None   
@@ -464,7 +468,7 @@ def loadModuleAs(pyFile, modName):
 #
 ##
 def runModuleFunc(module, method, *args, **kwargs):
-    _callable = getattr(module, method)
+    _callable = getattr(module, method)    
     if callable(_callable):
         return _callable(*args, **kwargs)
 
@@ -569,26 +573,39 @@ class SectionRun(object):
             setattr(self.localModule, glob.globalRef, obj)
             self.localObjs.append(glob.globalRef)     
     
-    def func(self):
+    def preFunc(self):
         self.sectionConf.splitMethod()
         self.sectionConf.splitArgs()
         self.sectionConf.splitReturn()
+    
+    def postFunc(self, ret):
+        if not ret == None:                
+            if not self.sectionConf.Return == "": 
+                setattr(self.globalModuel, self.sectionConf.Return, ret)
+                self.globalObjs.append(self.sectionConf.Return) 
+            return ret
+        
+        
+    def func(self):
+        self.preFunc()
+        ret = None
         if not self.sectionConf.Method == "":            
             if self.localModule == None:
                 error = "local module has not been loaded."
                 raise CommonIoError(error)    
             ret = runModuleFuncArgsLine(self.localModule, self.sectionConf.Method, ",".join(self.sectionConf.Args))
 #            _returnConf = getConf(pySectionName, CON_PYTHON_SECTION_RETURN)
-            if not ret == None:                
-                setattr(self.globalModuel, self.sectionConf.Return, ret)
-                self.globalObjs.append(self.sectionConf.Return) 
-                return ret
-        return None
+        self.postFunc(ret)
+        return ret
+    
     
     def dumps(self):
         self.sectionConf.splitDumps()
         for dump in self.sectionConf.Dumps:
             dumpFromLine(dump.objName, dump.pickleId)
+ 
+    def newInstance(self):
+        return SectionRun()        
  
     def requires(self): 
         self.sectionConf.splitRequires()
@@ -596,7 +613,7 @@ class SectionRun(object):
             log.debug("SectionRun.requires(): self.sectionConf.Section=%s, self.sectionConf.Requires=%s", self.sectionConf.Section,",".join(self.sectionConf.Requires))
         rets = []
         for req in self.sectionConf.Requires:
-            secRun = SectionRun()
+            secRun = self.newInstance()
             ''' set section type is required section '''            
             secRun.readSectionConf(req)
             secRun.sectionConf.typeReq()
@@ -623,7 +640,6 @@ class SectionRun(object):
         self.globalObjs = []
         self.localModule = None
            
-    
     def run(self):
         self.sectionConf.splitAll()
         if config.LOGWIRE :
@@ -675,6 +691,47 @@ class SectionRun(object):
     
 ###  @End class SectionRun(object):
 
+
+class SectionRunPyro4(SectionRun):
+    def __init__(self):
+        SectionRun.__init__(self)
+        self.Pyro4ArgKey = ""
+        self.Pyro4RetKey = ""
+        
+    def clear(self):
+        SectionRun.clear(self)
+        self.Pyro4ArgKey = ""
+        self.Pyro4RetKey = ""
+        
+    def preFunc(self):    
+        SectionRun.preFunc(self)
+        pyro4Args = get(self.Pyro4ArgKey)       
+        if pyro4Args is None:
+            error = "None value by pyro4 argument key: %s" % self.Pyro4ArgKey
+            raise CommonIoError(error)        
+         
+        for i in range(len(pyro4Args)):
+            pyro4Argi = "pyro4Arg_" + str(i + 1)
+            setattr(self.globalModuel, pyro4Argi, pyro4Args[i])
+            self.globalObjs.append(pyro4Argi) 
+            ''' Replacement parameters '''
+            for j in range(len(self.sectionConf.Args)):
+                if self.sectionConf.Args[j] == "%%" + str(i + 1) :
+                    self.sectionConf.Args[j] = pyro4Argi
+                elif self.sectionConf.Args[j] == "&&" + str(i + 1) :
+                    self.sectionConf.Args[j] = pyro4Args[i]        
+        
+    def postFunc(self, ret):
+        SectionRun.postFunc(self, ret)
+        if ret is not None: 
+            put(self.Pyro4RetKey, ret)
+        
+    def newInstance(self):
+        return SectionRunPyro4()          
+
+##
+# allows directory running the Python functions.
+##
 def runPythonSectionConf(pySectionName):
     secRun = SectionRun()
     secRun.readSectionConf(pySectionName)
@@ -682,16 +739,17 @@ def runPythonSectionConf(pySectionName):
 #     ret = secRun.ret()
     return ret
 
-
 def runPythonSectionConfArgs(pySectionName, moduleConf, argsConf):
     secRun = SectionRun()
     secRun.readSectionConf(pySectionName)
     secRun.sectionConf.PythonFileConf = moduleConf
     secRun.sectionConf.ArgsConf = argsConf
     ret = secRun.run()
-#     ret = secRun.ret()
     return ret
 
+##
+#  Running python section without read configuration file.
+##
 def runPythonSection(moduleConf, loadConf, globalConf, funcConf, argsConf, returnConf, dumpConf):
     sectionConf = SectionConf()
     sectionConf.PythonFileConf = moduleConf
@@ -708,9 +766,22 @@ def runPythonSection(moduleConf, loadConf, globalConf, funcConf, argsConf, retur
     return ret
 
 
-def main():        
-    print runPythonSectionConf(sys.argv[1])
+def runPythonSectionConfPyro4(pySectionName, pyro4ArgKey):
+    secRun = SectionRunPyro4()
+    secRun.readSectionConf(pySectionName)
+    secRun.Pyro4ArgKey = pyro4ArgKey
+    secRun.Pyro4RetKey = "RETURN_"+pyro4ArgKey
+    ret = secRun.run()
+#     ret = secRun.ret()
+    return ret
 
+
+# def main():        
+#     print runPythonSectionConf(sys.argv[1])
+
+def main():        
+    print runPythonSectionConfPyro4(sys.argv[1], sys.argv[2])
+    
 if __name__ == "__main__":
     main()
 

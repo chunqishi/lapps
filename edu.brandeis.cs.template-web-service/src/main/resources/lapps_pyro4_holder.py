@@ -148,7 +148,7 @@ class Daemon(object):
             # Try to ps find pid
             s = subprocess.Popen(["ps", "axw"], stdout=subprocess.PIPE)
             for x in s.stdout:
-                if re.search(pid, x):
+                if re.search(str(pid), x):
                     return True
                 
             # If pid not running.    
@@ -242,7 +242,8 @@ class HolderServer(Daemon):
     def run(self):
         '''
             After start ()
-            You can check python -m Pyro4.nsc list
+            You can check:
+            python -m Pyro4.nsc list
         '''
         hostname=socket.gethostname()
         nameserverUri, nameserverDaemon, broadcastServer = Pyro4.naming.startNS(host=hostname)
@@ -307,4 +308,9 @@ def get(key):
     return val
 
 if __name__ == "__main__":
-    start()
+#     start()
+    val = get("key")
+    print val
+    for i in range(len(val)):
+        print val[i]
+    

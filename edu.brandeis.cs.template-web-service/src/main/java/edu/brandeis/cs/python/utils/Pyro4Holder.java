@@ -16,7 +16,7 @@ import net.razorvine.pyro.PyroProxy;
 public class Pyro4Holder {
 	private NameServerProxy ns = null;
 	private PyroProxy remoteobject = null;
-	public static final String PYRONAME = "PYRONAME:Holder";
+	public static final String PYRONAME = "Holder";
 	String hostname = null;
 	
 	public Pyro4Holder() throws IOException{
@@ -48,11 +48,11 @@ public class Pyro4Holder {
 		String hostname = InetAddress.getLocalHost().getHostName();
 		System.out.println(hostname);
 	    NameServerProxy ns = NameServerProxy.locateNS(hostname);
-	    PyroProxy remoteobject = new PyroProxy(ns.lookup("PYRONAME:Holder"));
-	    Object result = remoteobject.call("get", "key");
+	    PyroProxy remoteobject = new PyroProxy(ns.lookup("Holder"));
+	    Object result = remoteobject.call("put", "key", new String[]{"'asdf'"});
 	    String message = (String)result.toString();  // cast to the type that 'pythonmethod' returns
 	    System.out.println(result.getClass());
-	    System.out.println("result message="+message);
+	    System.out.println("result message=" + message);
 	    remoteobject.close();
 	    ns.close();
 	}
