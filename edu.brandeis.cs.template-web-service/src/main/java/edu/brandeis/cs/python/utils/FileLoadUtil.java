@@ -9,7 +9,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.anc.resource.ResourceLoader;
-
+/**
+ * Provide self needed file loading related functions.
+ * @author shicq@cs.brandeis.edu
+ *
+ */
 public class FileLoadUtil {
 
 	public static final String checksumMD5(File file)
@@ -24,7 +28,12 @@ public class FileLoadUtil {
 
 	private static final ConcurrentHashMap<String, String> fileHashMap = new ConcurrentHashMap<String, String>(
 			256);
-
+/**
+ * Find resources from class path.  Java class loader provides getResources function.  
+ * Using it, we can locate the uri of the resource.    
+ * @param resource
+ * @return
+ */
 	public static File locate(String resource) {
 		File resFile = null;
 		try {
@@ -42,6 +51,15 @@ public class FileLoadUtil {
 		return resFile;
 	}
 
+/**
+ * We use a hash map memory to hold loaded files' check sum. 
+ * If the check sum is changed, we return True. 
+ * Here we use MD5 check sum, since its speed is acceptable for normal size files.	
+ * @param file
+ * @return
+ * @throws NoSuchAlgorithmException
+ * @throws IOException
+ */
 	public static final boolean needUpdate(File file)
 			throws NoSuchAlgorithmException, IOException {
 		String path = file.getCanonicalPath();
@@ -53,6 +71,14 @@ public class FileLoadUtil {
 		return !currChechsum.equals(lastChechsum);
 	}
 
+/**
+ * Provide check sum function, which read all the bits and calculate the  digested string. 	
+ * @param file
+ * @param dgst
+ * @return
+ * @throws NoSuchAlgorithmException
+ * @throws IOException
+ */
 	public static final String checksum(File file, String dgst)
 			throws NoSuchAlgorithmException, IOException {
 		MessageDigest md = MessageDigest.getInstance(dgst);

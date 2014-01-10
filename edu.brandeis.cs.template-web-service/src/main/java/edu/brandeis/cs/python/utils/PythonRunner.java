@@ -17,27 +17,41 @@ import org.slf4j.LoggerFactory;
 public class PythonRunner {
 	
 	public static final String CONF_FILE = "lapps.conf";
-	public static final String CONF_PYTHON_FILE = "ConfigurationPython";
+	
 	
 	public static final String ESCAPE_MARK_QUOTATION = "\"";
 	public static final String ESCAPE_MARK_SINGLE_QUOTATION = "'";	
 	
-	public static final String CONF_SECTION_DEFAULT = "default";
-	public static final String CONF_PICKLE_PATH = "PickleHome";
 	
+	// the name of default section
+	public static final String CONF_SECTION_DEFAULT = "default";
+	// set the pickle saving/loading directory
+	public static final String CONF_PICKLE_PATH = "PickleHome";
+	// set the interface Python cmd function
+	public static final String CONF_PYTHON_FILE = "PythonInterface";
+	
+	// load pickle file into memory.
+	public static final String CONF_PYTHON_SECTION_LOADS = "Loads";
+	// set global variable need in the function
 	public static final String CONF_PYTHON_SECTION_GLOBALS = "Globals";
+	// running required sections before this function
+	public static final String CONF_PYTHON_SECTION_REQUIRES = "Requires";
+	// the Python file has the target function
+	public static final String CONF_PYTHON_SECTION_FILE = "PythonFile";
+	// the target function name
+	public static final String CONF_PYTHON_SECTION_FUNC = "Method";
+	// the arguments need for this function
+	public static final String CONF_PYTHON_SECTION_ARGS = "Args";
+	// the return reference
+	public static final String CONF_PYTHON_SECTION_RETURN = "Return";
+	// dump needed data into pickle file.
+	public static final String CONF_PYTHON_SECTION_DUMPS = "Dumps";
+
 	public static final String CONF_PYTHON_SECTION_GLOBALS_SEPARATOR = ",";
 	public static final String CONF_PYTHON_SECTION_GLOBALS_SETATTR_SEPARATOR = ":";
-	public static final String CONF_PYTHON_SECTION_REQUIRES = "Requires";
 	public static final String CONF_PYTHON_SECTION_REQUIRES_SEPARATOR = ",";
-	public static final String CONF_PYTHON_SECTION_LOADS = "Loads";
 	public static final String CONF_PYTHON_SECTION_LOADS_SEPARATOR = ",";
 	public static final String CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR = ":";
-	public static final String CONF_PYTHON_SECTION_FILE = "PythonFile";
-	public static final String CONF_PYTHON_SECTION_FUNC = "Method";
-	public static final String CONF_PYTHON_SECTION_ARGS = "Args";
-	public static final String CONF_PYTHON_SECTION_RETURN = "Return";
-	public static final String CONF_PYTHON_SECTION_DUMPS = "Dumps";
 	
 	public static final String NULL = "";
 	
@@ -191,6 +205,21 @@ public class PythonRunner {
 		}
 		
 		return runPython(pythonFile, "-i", section, module, args);
+	}
+	
+	public Object runPythonPyro4Holder(String section, Object ... arrParams) throws PythonRunnerException {
+		String key = section + ":" + System.currentTimeMillis();
+		try {
+			Pyro4Holder holder = new Pyro4Holder();
+			holder.put(key, arrParams);
+			
+			// runPythonSection
+			
+			Object obj = holder.get(key);
+			return obj;
+		} catch(IOException e) {
+			throw new PythonRunnerException("Holder Initialization Exception:", e);
+		}
 	}
 
 	

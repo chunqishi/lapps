@@ -6,9 +6,11 @@ import net.razorvine.pyro.NameServerProxy;
 import net.razorvine.pyro.PyroProxy;
 
 /**
- * 
+ * Provide and interface co-work with the src/main/resource/lapps_pyro4_holder.py
+ * <p>1. It allows read the Holder's function get() and put().
+ * <p>2. It read the lapps.conf file to locate another lapps_pyro4_holder.py files. 
  * @refer http://pythonhosted.org/Pyro4/pyrolite.html
- * @author shicq
+ * @author shicq@cs.brandeis.edu
  *
  */
 public class Pyro4Holder {

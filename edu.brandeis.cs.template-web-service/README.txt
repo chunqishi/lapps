@@ -30,7 +30,7 @@ DONE:
    
 TODO:
 1. Provide Java pickle access
-2. Provide Pyro4 interface
+2. Provide Pyro4 interface (Since current version only pass string parameters.)
    
 
 
