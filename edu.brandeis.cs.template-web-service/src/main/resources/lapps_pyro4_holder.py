@@ -306,15 +306,12 @@ def get(key):
     try:
         # Get key 
         holder = Pyro4.core.Proxy("PYRONAME:" + Holder.nameSpace())
-        val = holder.get(key)
+        val = holder.getAndClear(key)
     except Exception:
         val = None
     return val
 
 if __name__ == "__main__":
-#     start()
-    val = get("key")
-    print val
-    for i in range(len(val)):
-        print val[i]
+     start()
+
     
