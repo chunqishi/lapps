@@ -293,7 +293,7 @@ public class PythonRunner {
 	/**
 	 * <p> We would like to use Pyro4 interface, which could get the function returned result 
 	 * instead of  the printed result in the python. 
-	 * 
+	 * @deprecated Please Use {@code runPythonSectionPyro}
 	 * @param section
 	 * @param arrParams
 	 * @return
