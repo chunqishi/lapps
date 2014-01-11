@@ -41,7 +41,7 @@ public class Pyro4Holder {
 	
 	// put object into holder, using key
 	public Object put(String key, Object obj) throws IOException, PythonRunnerException{
-		pyRun.runPythonPyro4Holder();
+		pyRun.startPyro4Holder();
 	    ns = NameServerProxy.locateNS(hostname);
 	    remoteobject = new PyroProxy(ns.lookup(PYRONAME));
 	    Object result = remoteobject.call("put", key, obj);

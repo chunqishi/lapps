@@ -16,10 +16,19 @@ public class HelloWorld implements IHelloWorld{
 
 	@Override
 	public String say(String world) throws PythonRunnerException {		
+		System.out.println("String say(String world)");
+		String defSectionName = this.getClass().getCanonicalName();
+		String ret = pr.runPythonSection(defSectionName, world);
+		return ret;
+	}		
+
+	public Object pyroSay(Object world) throws PythonRunnerException {
+		System.out.println("Object pyroSay(Object world)");
 		String defSectionName = this.getClass().getCanonicalName();
 		Object ret = pr.runPythonSectionPyro4(defSectionName, world);
-		return ret.toString();
+		return ret;
 	}		
+
 	
 	public String name(){
 		return this.getClass().getCanonicalName();

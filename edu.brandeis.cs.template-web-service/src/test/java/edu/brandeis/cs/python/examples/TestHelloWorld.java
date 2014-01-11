@@ -46,6 +46,14 @@ public class TestHelloWorld{
 		Assert.assertEquals(tips, expect, actual);
 	}
 	
+	@Test
+	public void testPyroSay() throws Exception{		
+		String actual = hw.pyroSay("world").toString();
+		String expect = "hi world";
+		String tips = "";
+		Assert.assertEquals(tips, expect, actual);
+	}
+	
 	@After
 	public void tear() throws Exception{
 		conf.deleteOnExit();

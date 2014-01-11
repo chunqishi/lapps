@@ -152,31 +152,6 @@ public class PythonRunner {
         return result.toString();
 	}
 	
-//	/**
-//	 * Run Python section, with string arguments 
-//	 * @param args
-//	 * @return
-//	 * @throws PythonRunnerException
-//	 */
-//	public String runPythonSection(String [] args) throws PythonRunnerException {
-//		File confFile = FileLoadUtil.locate(confPath);
-//		try {
-//			if (FileLoadUtil.needUpdate(confFile)){
-//				init(confFile.getAbsolutePath());
-//			}
-//		} catch (NoSuchAlgorithmException e) {
-//			e.printStackTrace();
-//			throw new PythonRunnerException(e);
-//		} catch (IOException e) {
-//			e.printStackTrace();
-//			throw new PythonRunnerException(e);
-//		}
-//		
-//		String pythonFileConf = getDefProperty(CONF_PYTHON_FILE);		
-//		String pythonFile = FileLoadUtil.locate(pythonFileConf).getAbsolutePath();
-//		return runPython(pythonFile, args);
-//	}
-	
 	public String getDefProperty(String key){
 		return getSectionProperty(CONF_SECTION_DEFAULT, key);
 	}
@@ -186,9 +161,9 @@ public class PythonRunner {
 //		System.out.println("section="+section+" key="+key+" value="+value);
 		return value;
 	}
-
 	
-	public String runPythonSection(String section, String ... arrParams) throws PythonRunnerException {
+	
+	public void updateConf() throws PythonRunnerException{
 		File confFile = FileLoadUtil.locate(confPath);
 		try {
 			if (FileLoadUtil.needUpdate(confFile)){
@@ -199,6 +174,11 @@ public class PythonRunner {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	
+	public String runPythonSection(String section, String ... arrParams) throws PythonRunnerException {
+		updateConf(); 
 		// read target python file
 		String module = getSectionProperty(section, CONF_PYTHON_SECTION_FILE);
 		module = FileLoadUtil.locate(module).getAbsolutePath();
@@ -223,15 +203,20 @@ public class PythonRunner {
 	}
 	
 	
-	public String runPythonPyro4Holder() throws PythonRunnerException{
-//		System.out.println("CONF_PYTHON_FILE = " + CONF_PYTHON_FILE);
+	public String startPyro4Holder() throws PythonRunnerException{
 		String pythonFileConf = getDefProperty(CONF_PYTHON_FILE);		
-//		System.out.println("pythonFileConf = " + pythonFileConf);
 		String pythonFile = FileLoadUtil.locate(pythonFileConf).getAbsolutePath();
-		return runPython(pythonFile, "-o");
+		return runPython(pythonFile, "-o", "start");
 	}
-	
+
+	public String stopPyro4Holder() throws PythonRunnerException{
+		String pythonFileConf = getDefProperty(CONF_PYTHON_FILE);		
+		String pythonFile = FileLoadUtil.locate(pythonFileConf).getAbsolutePath();
+		return runPython(pythonFile, "-o", "stop");
+	}
+
 	public Object runPythonSectionPyro4(String section, Object ... arrParams) throws PythonRunnerException {
+		updateConf();
 		// provide function running sockets key
 		String key = section + ":" + System.currentTimeMillis();
 		try {

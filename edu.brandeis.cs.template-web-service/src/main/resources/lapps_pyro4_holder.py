@@ -290,6 +290,10 @@ def start():
     if not hs.status():
         hs.start()
 
+def stop():
+    hs = HolderServer()
+    hs.stop()
+        
 def put(key, val):
     # if HolderServer not running
     start()

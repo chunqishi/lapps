@@ -14,7 +14,7 @@ from optparse import OptionParser
 
 from lapps_common_io import runPythonSectionConf, runPythonSection, runPythonSectionConfArgs, runPythonSectionConfPyro4
 
-from lapps_pyro4_holder import start
+from lapps_pyro4_holder import start, stop
 
 
 CONS_USAGE = "usage: %prog [options]"
@@ -27,8 +27,8 @@ def main():
                       help="read section name in lapps.conf")
     parser.add_option("-p", "--pyro", action="store", type="string", nargs=2, dest="pyro",
                       help="using pyro for running section name in lapps.conf")
-    parser.add_option("-o", "--holder", action="store", type="string", nargs=0, dest="holder",
-                      help="start holder")
+    parser.add_option("-o", "--holder", action="store", type="string", nargs=1, dest="holder",
+                      help="start/stop holder")
     parser.add_option("-i", "--inputs", action="store", type="string", nargs=3, dest="inputs",
                       help="only inputs  (section, module, args)")
     parser.add_option("-a", "--all", action="store", type="string", nargs=7, dest="allargs",
@@ -44,9 +44,15 @@ def main():
         print runPythonSectionConfArgs(options.inputs[0],options.inputs[1],options.inputs[2])
     elif not options.pyro == None and len(options.pyro) == 2:
         print runPythonSectionConfPyro4(options.pyro[0],options.pyro[1])
-    elif not options.holder == None and len(options.holder) == 0:
-        start()
+    elif not options.holder == None and options.holder:
+        if options.holder.strip() == "start":
+            start()
+        elif options.holder.strip() == "stop":
+            stop()   
+        else:
+            parser.error("unknown control NOT (start / stop)")
     elif options.verbose:    
+        print options.holder[0], len(options.holder)
         parser.error("incorrect number of options")
         
 if __name__ == "__main__":
