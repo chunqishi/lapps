@@ -35,12 +35,9 @@ public class DecisionTreeClassifier implements IClassify {
 		return ret;
 	}
 
-//	@Override
+	@Override
 	public String[] listFeatureSets() throws PythonRunnerException {
 		ArrayList arr = (ArrayList) pr.runPythonSectionPyro("edu.brandeis.cs.python.examples.nltk.DecisionTreeClassifier.listFeatureSets");
-		System.out.println(arr);
-		System.out.println(arr.getClass());
-//		Object[]
 		return (String[])arr.toArray(new String[arr.size()]);
 	}
 

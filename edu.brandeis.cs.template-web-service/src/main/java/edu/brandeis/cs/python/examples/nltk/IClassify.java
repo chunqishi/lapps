@@ -30,7 +30,13 @@ public interface IClassify {
 	 * @throws ClassifyException
 	 */
 	public String predict(String classifierID, String input) throws PythonRunnerException;
-
+	
+	/**
+	 * 
+	 * @return existing feature sets.
+	 * @throws ClassifyException
+	 */
+	public String [] listFeatureSets() throws PythonRunnerException;
 }
 
 

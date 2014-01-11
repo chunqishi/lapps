@@ -4,7 +4,7 @@
 ##
 
 [default]
-ConfigurationPython = lapps_java_cmd.py
+PythonInterface = lapps_java_cmd.py
 PickleHome =
 
 ##
@@ -23,22 +23,84 @@ PickleHome =
 # Requires=example,example
 ##
 
-[helloworld.append]
-Loads=
-PythonFile=examples/helloworld.py
-Method=append
-Args="hello", "world"
-Return=example_hello_world
-Dumps=example_hello_world:helloworld.append.example_hello_world
-
-[edu.brandeis.cs.python.examples.HelloWorld]
-Loads=
-PythonFile=examples/helloworld.py
-Method=say
-Args="Chunqi SHI"
-Return=example_hello_world
-Dumps=example_hello_world:helloworld.append.example_hello_world
+[edu.brandeis.cs.python.examples.HelloWorld] 
+PythonFile=examples/helloworld.py 
+Globals=hello:"hi" 
+Method=say 
+Args=%%1
 
 
-[helloworld]
-Requires=helloworld.append,edu.brandeis.cs.python.examples.HelloWorld
+
+####
+#   NLTK  pre-processing
+####
+[edu.brandeis.cs.python.examples.nltk.features_brown_news]
+Requires=edu.brandeis.cs.python.examples.nltk.common_suffixes
+Loads=common_suffixes:edu.brandeis.cs.python.examples.nltk.common_suffixes/common_suffixes
+PythonFile=examples/nltk_chapter6_pos_tagger.py
+Globals=common_suffixes:common_suffixes 
+Method=features_brown_news
+Return=features_brown_news
+Dumps=features_brown_news:edu.brandeis.cs.python.examples.nltk.features_brown_news/features_brown_news
+
+[edu.brandeis.cs.python.examples.nltk.common_suffixes]
+PythonFile=examples/nltk_chapter6_pos_tagger.py
+Method=get_common_suffixes
+Return=common_suffixes
+Dumps=common_suffixes:edu.brandeis.cs.python.examples.nltk.common_suffixes/common_suffixes
+
+####
+#   NaiveBayesClassifier train()
+####
+[edu.brandeis.cs.python.examples.nltk.NaiveBayesClassifier.train]
+Requires=edu.brandeis.cs.python.examples.nltk.features_brown_news
+Loads=features_brown_news:edu.brandeis.cs.python.examples.nltk.features_brown_news/features_brown_news
+PythonFile=examples/nltk_chapter6_pos_tagger.py
+Method=trainNaiveBayesClassifier
+Args=&&1
+Return=classifier
+Dumps=classifier:edu.brandeis.cs.python.examples.nltk.NaiveBayesClassifier.train/classifier
+
+####
+#   NaiveBayesClassifier predict()
+####
+[edu.brandeis.cs.python.examples.nltk.NaiveBayesClassifier.predict]
+Loads=features_brown_news:edu.brandeis.cs.python.examples.nltk.NaiveBayesClassifier.train/classifier
+PythonFile=examples/nltk_chapter6_pos_tagger.py
+Method=predict
+Args=&&1,%%2
+Return=tagger
+
+[edu.brandeis.cs.python.examples.nltk.NaiveBayesClassifier.listFeatureSets]
+PythonFile=examples/nltk_chapter6_pos_tagger.py
+Method=listFeatureSets
+
+
+####
+#   DecisionTreeClassifier train()
+####
+[edu.brandeis.cs.python.examples.nltk.DecisionTreeClassifier.train]
+Requires=edu.brandeis.cs.python.examples.nltk.features_brown_news
+Loads=features_brown_news:edu.brandeis.cs.python.examples.nltk.features_brown_news/features_brown_news
+PythonFile=examples/nltk_chapter6_pos_tagger.py
+Method=trainDecisionTreeClassifier
+Args=&&1
+Return=classifier
+Dumps=classifier:edu.brandeis.cs.python.examples.nltk.DecisionTreeClassifier.train/classifier
+
+####
+#   DecisionTreeClassifier predict()
+####
+[edu.brandeis.cs.python.examples.nltk.DecisionTreeClassifier.predict]
+Loads=features_brown_news:edu.brandeis.cs.python.examples.nltk.DecisionTreeClassifier.train/classifier
+PythonFile=examples/nltk_chapter6_pos_tagger.py
+Method=predict
+Args=&&1,%%2
+Return=tagger
+
+
+
+[edu.brandeis.cs.python.examples.nltk.DecisionTreeClassifier.listFeatureSets]
+PythonFile=examples/nltk_chapter6_pos_tagger.py
+Method=listFeatureSets
+
