@@ -219,6 +219,13 @@ public class PythonRunner {
 		return runPython(pythonFile, "-i", section, module, args);
 	}
 	
+	
+	public String runPythonPyro4Holder() throws PythonRunnerException{
+		String pythonFileConf = getDefProperty(CONF_PYTHON_FILE);		
+		String pythonFile = FileLoadUtil.locate(pythonFileConf).getAbsolutePath();
+		return runPython(pythonFile, "-o");
+	}
+	
 	public Object runPythonSectionPyro4(String section, Object ... arrParams) throws PythonRunnerException {
 		// provide function running sockets key
 		String key = section + ":" + System.currentTimeMillis();
@@ -227,9 +234,10 @@ public class PythonRunner {
 			Pyro4Holder holder = new Pyro4Holder();
 			// push all the parameters into sockets 
 			holder.put(key, arrParams);
-			
+			String pythonFileConf = getDefProperty(CONF_PYTHON_FILE);		
+			String pythonFile = FileLoadUtil.locate(pythonFileConf).getAbsolutePath();
 			// runPythonSection
-
+			runPython(pythonFile, "-p", section, key);
 			// read the return value from the sockets.
 			Object obj = holder.get(key);
 			return obj;

@@ -12,7 +12,9 @@ import ConfigParser
 
 from optparse import OptionParser
 
-from lapps_common_io import runPythonSectionConf, runPythonSection, runPythonSectionConfArgs
+from lapps_common_io import runPythonSectionConf, runPythonSection, runPythonSectionConfArgs, runPythonSectionConfPyro4
+
+from lapps_pyro4_holder import start
 
 
 CONS_USAGE = "usage: %prog [options]"
@@ -23,6 +25,10 @@ def main():
     parser.set_defaults(verbose=True)
     parser.add_option("-s", "--section", action="store", type="string", nargs=1, dest="section",
                       help="read section name in lapps.conf")
+    parser.add_option("-p", "--pyro", action="store", type="string", nargs=2, dest="pyro",
+                      help="using pyro for running section name in lapps.conf")
+    parser.add_option("-o", "--holder", action="store", type="string", nargs=0, dest="holder",
+                      help="start holder")
     parser.add_option("-i", "--inputs", action="store", type="string", nargs=3, dest="inputs",
                       help="only inputs  (section, module, args)")
     parser.add_option("-a", "--all", action="store", type="string", nargs=7, dest="allargs",
@@ -35,7 +41,11 @@ def main():
     elif not options.allargs == None and len(options.allargs) == 7:
         print runPythonSection(options.allargs[0],options.allargs[1],options.allargs[2],options.allargs[3],options.allargs[4],options.allargs[5],options.allargs[6])
     elif not options.inputs == None and len(options.inputs) == 3:
-        print runPythonSectionConfArgs(options.inputs[0],options.inputs[1],options.inputs[2]);    
+        print runPythonSectionConfArgs(options.inputs[0],options.inputs[1],options.inputs[2])
+    elif not options.pyro == None and len(options.pyro) == 2:
+        print runPythonSectionConfPyro4(options.inputs[0],options.inputs[1])
+    elif not options.holder == None and len(options.holder) == 0:
+        start()
     elif options.verbose:    
         parser.error("incorrect number of options")
         

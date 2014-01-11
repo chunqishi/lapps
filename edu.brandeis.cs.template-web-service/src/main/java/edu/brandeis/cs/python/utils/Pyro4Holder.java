@@ -19,13 +19,23 @@ public class Pyro4Holder {
 	public static final String PYRONAME = "Holder";
 	String hostname = null;
 	
-	public Pyro4Holder() throws IOException{
+	PythonRunner pyRun = null;
+	
+	public Pyro4Holder() throws IOException, PythonRunnerException{
 		// read local sever hostname
 		hostname = InetAddress.getLocalHost().getHostName();
+		pyRun = new PythonRunner(); 
+	}
+
+	public Pyro4Holder(String confPath) throws IOException, PythonRunnerException{
+		// read local sever hostname
+		hostname = InetAddress.getLocalHost().getHostName();
+		pyRun = new PythonRunner(confPath); 
 	}
 	
 	// put object into holder, using key
-	public Object put(String key, Object obj) throws IOException{
+	public Object put(String key, Object obj) throws IOException, PythonRunnerException{
+		pyRun.runPythonPyro4Holder();
 	    ns = NameServerProxy.locateNS(hostname);
 	    remoteobject = new PyroProxy(ns.lookup(PYRONAME));
 	    Object result = remoteobject.call("put", key, obj);
