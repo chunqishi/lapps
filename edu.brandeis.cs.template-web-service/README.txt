@@ -11,10 +11,11 @@
 Lapps Common IO (for Python) Version 0.04
 
 DONE:
-1.
+1. Pyro4 (Pyrolite/Pickle) Interface finished. 
+2. Web Service XML Configuration Added. 
 
 TODO:
-
+1. Well documentations
 
 
 
