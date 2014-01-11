@@ -53,6 +53,9 @@ public class PythonRunner {
 	public static final String CONF_PYTHON_SECTION_LOADS_SEPARATOR = ",";
 	public static final String CONF_PYTHON_SECTION_LOADS_PICKLE_SEPARATOR = ":";
 	
+	
+	public static final String PYRO4_RET_HEADER = "RETURN_";
+	
 	public static final String NULL = "";
 	
 	protected static final Logger logger = LoggerFactory
@@ -118,7 +121,7 @@ public class PythonRunner {
         String[] callAndArgs = new String[arrParams.length + 2];
         callAndArgs[0] = "python";
         callAndArgs[1] = pythonFile;
-        System.out.print("python "+ pythonFile);
+        System.out.print("runPython(): python "+ pythonFile);
         for (int i = 0; i < arrParams.length; i++) {
         	callAndArgs[2 + i] = arrParams[i];
         	System.out.print(" " + escapePyParam(arrParams[i]));
@@ -145,7 +148,7 @@ public class PythonRunner {
         	throw new PythonRunnerException(e);
         }
         // RETURN THE RESULT RATHER THAN PRINTING IT
-        System.out.println("runPython=" + result.toString());
+        System.out.println("runPython(): result=" + result.toString());
         return result.toString();
 	}
 	
@@ -221,7 +224,9 @@ public class PythonRunner {
 	
 	
 	public String runPythonPyro4Holder() throws PythonRunnerException{
+//		System.out.println("CONF_PYTHON_FILE = " + CONF_PYTHON_FILE);
 		String pythonFileConf = getDefProperty(CONF_PYTHON_FILE);		
+//		System.out.println("pythonFileConf = " + pythonFileConf);
 		String pythonFile = FileLoadUtil.locate(pythonFileConf).getAbsolutePath();
 		return runPython(pythonFile, "-o");
 	}
@@ -231,15 +236,15 @@ public class PythonRunner {
 		String key = section + ":" + System.currentTimeMillis();
 		try {
 			// create a new connection for pyro4holder.
-			Pyro4Holder holder = new Pyro4Holder();
+			Pyro4Holder holder = new Pyro4Holder(this);
 			// push all the parameters into sockets 
 			holder.put(key, arrParams);
-			String pythonFileConf = getDefProperty(CONF_PYTHON_FILE);		
+			String pythonFileConf = getDefProperty(CONF_PYTHON_FILE);
 			String pythonFile = FileLoadUtil.locate(pythonFileConf).getAbsolutePath();
 			// runPythonSection
 			runPython(pythonFile, "-p", section, key);
 			// read the return value from the sockets.
-			Object obj = holder.get(key);
+			Object obj = holder.get(PYRO4_RET_HEADER + key);
 			return obj;
 		} catch(IOException e) {
 			throw new PythonRunnerException("Holder Initialization Exception:", e);

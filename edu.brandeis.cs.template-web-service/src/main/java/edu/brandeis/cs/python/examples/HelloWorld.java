@@ -17,8 +17,8 @@ public class HelloWorld implements IHelloWorld{
 	@Override
 	public String say(String world) throws PythonRunnerException {		
 		String defSectionName = this.getClass().getCanonicalName();
-		String ret = pr.runPythonSection(defSectionName, world);
-		return ret;
+		Object ret = pr.runPythonSectionPyro4(defSectionName, world);
+		return ret.toString();
 	}		
 	
 	public String name(){

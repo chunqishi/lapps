@@ -243,7 +243,7 @@ class HolderServer(Daemon):
         '''
             After start ()
             You can check:
-            python -m Pyro4.nsc list
+            python -m Pyro4.nsc list        <----------------------------------------------
         '''
         hostname=socket.gethostname()
         nameserverUri, nameserverDaemon, broadcastServer = Pyro4.naming.startNS(host=hostname)

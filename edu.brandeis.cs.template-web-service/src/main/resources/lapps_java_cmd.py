@@ -43,7 +43,7 @@ def main():
     elif not options.inputs == None and len(options.inputs) == 3:
         print runPythonSectionConfArgs(options.inputs[0],options.inputs[1],options.inputs[2])
     elif not options.pyro == None and len(options.pyro) == 2:
-        print runPythonSectionConfPyro4(options.inputs[0],options.inputs[1])
+        print runPythonSectionConfPyro4(options.pyro[0],options.pyro[1])
     elif not options.holder == None and len(options.holder) == 0:
         start()
     elif options.verbose:    

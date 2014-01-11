@@ -32,6 +32,12 @@ public class Pyro4Holder {
 		hostname = InetAddress.getLocalHost().getHostName();
 		pyRun = new PythonRunner(confPath); 
 	}
+
+	public Pyro4Holder(PythonRunner pyRun) throws IOException, PythonRunnerException{
+		// read local sever hostname
+		hostname = InetAddress.getLocalHost().getHostName();
+		this.pyRun = pyRun; 
+	}
 	
 	// put object into holder, using key
 	public Object put(String key, Object obj) throws IOException, PythonRunnerException{

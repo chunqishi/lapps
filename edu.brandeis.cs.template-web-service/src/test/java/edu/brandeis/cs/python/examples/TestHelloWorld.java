@@ -24,7 +24,7 @@ public class TestHelloWorld{
 					"##\n"+
 					
 					"[default]\n"+
-					"ConfigurationPython = lapps_java_cmd.py\n"+
+					"PythonInterface = lapps_java_cmd.py\n"+
 					"PickleHome =\n"+
 					
 					"[edu.brandeis.cs.python.examples.HelloWorld]\n"+ 
