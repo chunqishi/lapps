@@ -18,6 +18,14 @@ public class TestDecisionTreeClassifier{
 	}
 	
 	@Test
+	public void testListFeatureSets() throws Exception{
+		String[] actual = dtc.listFeatureSets();
+		String[] expect = new String[]{"features_brown_news"};
+		String tips = "feature sets are not right.";
+		Assert.assertArrayEquals(tips, expect, actual);
+	}
+	
+	@Test
 	public void testTrain() throws Exception{
 		String actual = dtc.train("features_brown_news");
 		String expect = "features_brown_news";
@@ -32,4 +40,7 @@ public class TestDecisionTreeClassifier{
 		String tips = "Boy has wrong tagger";
 		Assert.assertEquals(tips, expect, actual);
 	}
+	
+	
+
 }

@@ -64,4 +64,5 @@ def trainNaiveBayesClassifier(featuresets):
     _classifier = nltk.NaiveBayesClassifier.train(_train_set)
     return _classifier
 
-    
+def listFeatureSets():
+    return ["features_brown_news"]    

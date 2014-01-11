@@ -1,5 +1,7 @@
 package edu.brandeis.cs.python.examples.nltk;
 
+import java.util.ArrayList;
+
 import edu.brandeis.cs.python.utils.PythonRunner;
 import edu.brandeis.cs.python.utils.PythonRunnerException;
 
@@ -34,10 +36,13 @@ public class DecisionTreeClassifier implements IClassify {
 	}
 
 //	@Override
-//	public String[] listFeatureSets() throws PythonRunnerException {
-//		String ret = pr.runPythonSection("edu.brandeis.cs.python.examples.nltk.DecisionTreeClassifier.listFeatureSets");
-//		return ret;
-//	}
+	public String[] listFeatureSets() throws PythonRunnerException {
+		ArrayList arr = (ArrayList) pr.runPythonSectionPyro("edu.brandeis.cs.python.examples.nltk.DecisionTreeClassifier.listFeatureSets");
+		System.out.println(arr);
+		System.out.println(arr.getClass());
+//		Object[]
+		return (String[])arr.toArray(new String[arr.size()]);
+	}
 
 	
 

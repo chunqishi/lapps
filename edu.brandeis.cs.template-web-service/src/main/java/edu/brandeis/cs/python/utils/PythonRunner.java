@@ -177,31 +177,7 @@ public class PythonRunner {
 	}
 
 	
-	public String runPythonSection(String section, String ... arrParams) throws PythonRunnerException {
-		updateConf(); 
-		// read target python file
-		String module = getSectionProperty(section, CONF_PYTHON_SECTION_FILE);
-		module = FileLoadUtil.locate(module).getAbsolutePath();
-		
-		// read parameter configurations
-		String args = getSectionProperty(section, CONF_PYTHON_SECTION_ARGS);
-		
-		// read python command interface
-		String pythonFileConf = getDefProperty(CONF_PYTHON_FILE);		
-		String pythonFile = FileLoadUtil.locate(pythonFileConf).getAbsolutePath();
-		
-		
-//		System.out.println("runPythonSection():module=" + module);
-		
-		// parameters replacements.
-		for(int i = 0; i < arrParams.length; i++){
-			args = args.replace("%%"+(i+1), escapePyParam(arrParams[i]));
-			args = args.replace("&&"+(i+1), arrParams[i]);
-		}
-		
-		return runPython(pythonFile, "-i", section, module, args);
-	}
-	
+
 	
 	public String startPyro4Holder() throws PythonRunnerException{
 		String pythonFileConf = getDefProperty(CONF_PYTHON_FILE);		
@@ -289,7 +265,7 @@ public class PythonRunner {
 	 * @throws PythonRunnerException
 	 */
 	
-	public Object runPythonSection(String section, Object ... arrParams) throws PythonRunnerException {
+	public Object runPythonSectionPyro(String section, Object ... arrParams) throws PythonRunnerException {
 		updateConf();
 		// provide function running sockets key
 		String key = section + ":" + System.currentTimeMillis();
@@ -309,7 +285,47 @@ public class PythonRunner {
 			throw new PythonRunnerException("Holder Initialization Exception:", e);
 		}
 	}
-
+	
+	public Object runPythonSection(String section, Object ... arrParams) throws PythonRunnerException {
+		return runPythonSectionPyro(section, arrParams);
+	}
+	
+	/**
+	 * <p> We would like to use Pyro4 interface, which could get the function returned result 
+	 * instead of  the printed result in the python. 
+	 * 
+	 * @param section
+	 * @param arrParams
+	 * @return
+	 * @throws PythonRunnerException
+	 */
+	
+	@Deprecated
+	public String runPythonSection(String section, String ... arrParams) throws PythonRunnerException {
+		updateConf(); 
+		// read target python file
+		String module = getSectionProperty(section, CONF_PYTHON_SECTION_FILE);
+		module = FileLoadUtil.locate(module).getAbsolutePath();
+		
+		// read parameter configurations
+		String args = getSectionProperty(section, CONF_PYTHON_SECTION_ARGS);
+		
+		// read python command interface
+		String pythonFileConf = getDefProperty(CONF_PYTHON_FILE);		
+		String pythonFile = FileLoadUtil.locate(pythonFileConf).getAbsolutePath();
+		
+		
+//		System.out.println("runPythonSection():module=" + module);
+		
+		// parameters replacements.
+		for(int i = 0; i < arrParams.length; i++){
+			args = args.replace("%%"+(i+1), escapePyParam(arrParams[i]));
+			args = args.replace("&&"+(i+1), arrParams[i]);
+		}
+		
+		return runPython(pythonFile, "-i", section, module, args);
+	}
+	
 	
 	public static final String escapePyParam(String arg){
 		arg = arg.trim();
