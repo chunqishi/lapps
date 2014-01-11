@@ -15,7 +15,7 @@ public class TestHelloWorld{
 	
 	private HelloWorld hw = null;
 	File conf = new File("TestHelloWorld.conf");
-
+	PythonRunner pr = null;
 	@Before
 	public void setUp() throws Exception {		
 		String data = "## \n"+
@@ -34,7 +34,7 @@ public class TestHelloWorld{
 					"Args=%%1\n";
 							
 		FileUtils.writeStringToFile(conf, data, "UTF-8");
-		PythonRunner pr = new PythonRunner(conf.getCanonicalPath());
+		pr = new PythonRunner(conf.getCanonicalPath());
 		hw = new HelloWorld(pr);
 	}
 	
@@ -57,6 +57,7 @@ public class TestHelloWorld{
 	@After
 	public void tear() throws Exception{
 		conf.deleteOnExit();
+		pr.stopPyro4Holder();
 	}
 
 }
