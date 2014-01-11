@@ -25,7 +25,7 @@ public class HelloWorld implements IHelloWorld{
 	public Object pyroSay(Object world) throws PythonRunnerException {
 		System.out.println("Object pyroSay(Object world)");
 		String defSectionName = this.getClass().getCanonicalName();
-		Object ret = pr.runPythonSectionPyro4(defSectionName, world);
+		Object ret = pr.runPythonSection(defSectionName, world);
 		return ret;
 	}		
 

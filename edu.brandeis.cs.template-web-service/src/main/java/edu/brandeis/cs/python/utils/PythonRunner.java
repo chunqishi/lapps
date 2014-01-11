@@ -215,7 +215,7 @@ public class PythonRunner {
 		return runPython(pythonFile, "-o", "stop");
 	}
 
-	public Object runPythonSectionPyro4(String section, Object ... arrParams) throws PythonRunnerException {
+	public Object runPythonSection(String section, Object ... arrParams) throws PythonRunnerException {
 		updateConf();
 		// provide function running sockets key
 		String key = section + ":" + System.currentTimeMillis();

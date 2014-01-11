@@ -52,12 +52,12 @@ public class TestHelloWorld{
 		String expect = "hi world";
 		String tips = "";
 		Assert.assertEquals(tips, expect, actual);
+		pr.stopPyro4Holder();
 	}
 	
 	@After
 	public void tear() throws Exception{
 		conf.deleteOnExit();
-		pr.stopPyro4Holder();
 	}
 
 }
