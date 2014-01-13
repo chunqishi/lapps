@@ -210,7 +210,7 @@ git version 1.8.2.1
 ......
 [shicq@chilote chunqishi]$ cd lapps/edu.brandeis.cs.template-web-service/ <span style="color:blue">&crarr;</span>
 [shicq@chilote edu.brandeis.cs.template-web-service]$
-[shicq@chilote edu.brandeis.cs.template-web-service]$ find . <span style="color:blue">&crarr; Display the directory tree</span>
+[shicq@chilote edu.brandeis.cs.template-web-service]$ find . <span style="color:blue">&crarr; (Display the directory tree)</span>
 .
 ./pom.xml
 ./src
@@ -232,7 +232,7 @@ git version 1.8.2.1
 ./src/test/java/edu/brandeis
 ./src/test/java/edu/brandeis/cs
 
-[shicq@chilote edu.brandeis.cs.template-web-service]$ mvn validate <span style="color:blue">&crarr; Maven validate</span>
+[shicq@chilote edu.brandeis.cs.template-web-service]$ mvn validate <span style="color:blue">&crarr; (Maven validate)</span>
 [INFO] Scanning for projects...
 [shicq@chilote edu.brandeis.cs.template-web-service]$
 
@@ -306,10 +306,10 @@ Before we implement them, we would like to define a common Python runner class: 
     For example, pip is used for installing pyro4.
 </p>
 
-<samp class="sample">[shicq@chilote Pyro4-4.22]$ pip install pyro4
+<samp class="sample">[shicq@chilote Pyro4-4.22]$ pip install pyro4 <span style="color:blue">&crarr;</span>
 </samp>
 <p> Or using easy_install </p>
-<samp class="sample">[shicq@chilote Pyro4-4.22]$ easy_install pyro4
+<samp class="sample">[shicq@chilote Pyro4-4.22]$ easy_install pyro4 <span style="color:blue">&crarr;</span>
 </samp>
 
 
@@ -650,7 +650,7 @@ Then, we can deploy and run <em>mvn package</em> to package the war: <b>nltk-web
 </p>
 
 <samp class="sample">
-[shicq@chilote edu.brandeis.cs.nltk-web-service]$ mvn clean;mvn package;
+[shicq@chilote edu.brandeis.cs.nltk-web-service]$ mvn clean;mvn package;<span style="color:blue">&crarr; (clean and package war)</span>
 ......
 [INFO] Copying webapp resources [/home/j/llc/shicq/Project/chunqishi/lapps/edu.brandeis.cs.nltk-web-service/src/main/webapp]
 [INFO] Webapp assembled in [34280 msecs]
@@ -669,31 +669,31 @@ We can deploy this war package into <a href="http://tomcat.apache.org/" target="
 </p>
 
 <samp class="sample">
-[shicq@chilote apache-tomcat-6.0.37]$ bin/shutdown.sh 
+[shicq@chilote apache-tomcat-6.0.37]$ bin/shutdown.sh <span style="color:blue">&crarr;</span>
 Using CATALINA_BASE:   /home/j/llc/shicq/Softwares/apache-tomcat-6.0.37
 Using CATALINA_HOME:   /home/j/llc/shicq/Softwares/apache-tomcat-6.0.37
 ......
 [shicq@chilote apache-tomcat-6.0.37]$ mv /home/j/llc/shicq/Project/chunqishi/lapps/edu.brandeis.cs.nltk-web-service/target/nltk-web-service.war webapps/
-[shicq@chilote apache-tomcat-6.0.37]$ bin/startup.sh 
+[shicq@chilote apache-tomcat-6.0.37]$ bin/startup.sh <span style="color:blue">&crarr;</span>
 Using CATALINA_BASE:   /home/j/llc/shicq/Softwares/apache-tomcat-6.0.37
 Using CATALINA_HOME:   /home/j/llc/shicq/Softwares/apache-tomcat-6.0.37
 
 </samp>
 
 <p>
-Now, we could visit <a href="http://chilote.cs.brandeis.edu:8080/" target="_blank">http://localhost:8080/</a>, and find out that tomcat is running. 
-Then, we could open <a href="http://chilote.cs.brandeis.edu:8080/nltk-web-service/jsServices" target="_blank">http://localhost:8080/nltk-web-service/jsServices</a> to invoke the JSON-RPC Web service.
+Now, we could visit <a href="http://eldrad.cs-i.brandeis.edu:8080/" target="_blank">http://localhost:8080/</a>, and find out that tomcat is running. 
+Then, we could open <a href="http://eldrad.cs-i.brandeis.edu:8080/nltk-web-service/jsServices" target="_blank">http://localhost:8080/nltk-web-service/jsServices</a> to invoke the JSON-RPC Web service.
 
 </p>
 
 
 <figure>
     <img src="python-as-web-service-shi-2013-12-17.img/img_jsonrpc_services.png" alt="JSON RPC Services" width="" height="">
-    <figcaption><h4><a href="http://chilote.cs.brandeis.edu:8080/nltk-web-service/jsServices" target="_blank">JSON RPC Services.</a></h4></figcaption></figure>    
+    <figcaption><h4><a href="http://eldrad.cs-i.brandeis.edu:8080/nltk-web-service/jsServices" target="_blank">JSON RPC Services.</a></h4></figcaption></figure>    
     
 <figure>
     <img src="python-as-web-service-shi-2013-12-17.img/img_naivebayes_listfeaturesets.png" alt="Naive Bayes Services" width="" height="">
-    <figcaption><h4><a href="http://chilote.cs.brandeis.edu:8080/nltk-web-service/jsServices" target="_blank">Availabe Feature Sets.</a></h4></figcaption></figure>    
+    <figcaption><h4><a href="http://eldrad.cs-i.brandeis.edu:8080/nltk-web-service/jsServices" target="_blank">Availabe Feature Sets.</a></h4></figcaption></figure>    
     
 <p> After, we list all the feature sets, we can train a classifier using the available feature set (e.g. <b>"features_brown_news"</b>).
 Since it is too complicated to design scalable feature extractors. Currently, we just provide users default available feature sets. 
@@ -701,19 +701,48 @@ Since it is too complicated to design scalable feature extractors. Currently, we
 
 <figure>
     <img src="python-as-web-service-shi-2013-12-17.img/img_naivebayes_train.png" alt="Naive Bayes Services" width="" height="">
-    <figcaption><h4><a href="http://chilote.cs.brandeis.edu:8080/nltk-web-service/jsServices" target="_blank">Training Naive Bayes Classifier.</a></h4></figcaption></figure>    
+    <figcaption><h4><a href="http://eldrad.cs-i.brandeis.edu:8080/nltk-web-service/jsServices" target="_blank">Training Naive Bayes Classifier.</a></h4></figcaption></figure>    
 
 <p>After the training, We can test this naive bayes classifier <b>"features_brown_news"</b>. We input a name <b>"dogs"</b>. It will output the POST Tagger <b>"NNS"</b>.
 
 </p>
 <figure>
     <img src="python-as-web-service-shi-2013-12-17.img/img_naivebayes_predict.png" alt="Naive Bayes Services" width="" height="">
-    <figcaption><h4><a href="http://chilote.cs.brandeis.edu:8080/nltk-web-service/jsServices" target="_blank">Testing Naive Bayes Classifier.</a></h4></figcaption></figure>    
+    <figcaption><h4><a href="http://eldrad.cs-i.brandeis.edu:8080/nltk-web-service/jsServices" target="_blank">Testing Naive Bayes Classifier.</a></h4></figcaption></figure>    
 
 
-<p> Finally, all the codes are available from Github <a href="https://github.com/chunqishi/lapps/tree/master/edu.brandeis.cs.nltk-web-service" target="_blank">edu.brandeis.cs.nltk-web-service</a>. 
-You can git clone for details. 
+<p> Finally, all the codes are available from Github
+    <a href="https://github.com/chunqishi/lapps/tree/master/edu.brandeis.cs.template-web-service" target="_blank">edu.brandeis.cs.template-web-service</a>.
+You can git clone for details.
+</p>
+<samp class="sample">
+[shicq@chilote lapps]$ git clone https://github.com/chunqishi/lapps.git<span style="color:blue">&crarr;(clone template-web-service)</span>
+[shicq@chilote chunqishi]$ cd lapps/edu.brandeis.cs.template-web-service/<span style="color:blue">&crarr;</span>
+[shicq@chilote edu.brandeis.cs.template-web-service]$
+</samp>
 
+<p>
+    Then, we could run mvn for package, and jetty:run for local web service testing.
+</p>
+
+<samp class="sample">
+[shicq@chilote edu.brandeis.cs.template-web-service]$ mvn package; mvn jetty:run <span style="color:blue">&crarr;(package war, and start jetty server)</span>
+...
+[INFO] Webapp directory = /home/j/llc/shicq/Project/chunqishi/lapps/edu.brandeis.cs.template-web-service/src/main/webapp
+[INFO] Starting jetty 6.1.10 ...
+[INFO] jetty-6.1.10
+[INFO] No Transaction manager found - if your webapp requires one, please configure one.
+[INFO] Started SelectChannelConnector@0.0.0.0:4040
+[INFO] Started Jetty Server
+[INFO] Starting scanner at interval of 10 seconds.
+Jan 13, 2014 11:27:50 AM org.springframework.context.support.AbstractApplicationContext prepareRefresh
+INFO: Refreshing jp.go.nict.langrid.servicecontainer.spring.WebappXmlApplicationContext@1ed14d8c: startup date [Mon Jan 13 11:27:50 EST 2014]; root of context hierarchy
+</samp>
+
+
+<p>
+    Finally, we could visit local service through
+    <a href="http://localhost:4040/template-web-service/jsServices" target="_blank">http://localhost:4040/template-web-service/jsServices</a>.
 </p>
 <!--
     
@@ -734,10 +763,11 @@ You can git clone for details.
 <footer><hr/> 
 <p>
     Progress: 
-    <progress value="60" max="100"></progress></p>
+    <progress value="80" max="100"></progress></p>
 <p>
     Contacts: 
     <nonsense>shi</nonsense>cq@<nonsense>cs.</nonsense>brandeis.<nonsense></nonsense>edu,
-    <nonsense>mar</nonsense>c@<nonsense>cs.</nonsense>brandeis.<nonsense></nonsense>edu  </p></footer>
+    <nonsense>mar</nonsense>c@<nonsense>cs.</nonsense>brandeis.<nonsense></nonsense>edu,
+    <nonsense>jam</nonsense>esp@<nonsense>cs.</nonsense>brandeis.<nonsense></nonsense>edu</p></footer>
     
     </body></html>
