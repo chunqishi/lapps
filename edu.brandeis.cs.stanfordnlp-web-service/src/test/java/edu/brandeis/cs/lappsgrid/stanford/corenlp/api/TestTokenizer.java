@@ -8,7 +8,8 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.brandeis.cs.lappsgrid.stanford.StanfordWebServiceException;
-import edu.stanford.nlp.process.Tokenizer;
+import edu.brandeis.cs.lappsgrid.stanford.corenlp.Tokenizer;
+
 
 /**
  * <i>TestTokenizer.java</i> Language Application Grids (<b>LAPPS</b>)
@@ -34,14 +35,5 @@ public class TestTokenizer extends TestCase {
 		String [] goldTokens = {"Hi",".","How","are","you","?","This","is","Mike","."};
 		Assert.assertArrayEquals("Tokenize Failure.", goldTokens, tokens);
 	}
-	
-	@Test
-	public void testTokenizePos() {
-		Span[] boundaries = tokenizer
-				.tokenizePos("Hi. How are you? This is Mike.");
-		Assert.assertEquals(
-				"Tokenize Failure.",
-				"[[0..2), [2..3), [4..7), [8..11), [12..15), [15..16), [17..21), [22..24), [25..29), [29..30)]",
-				Arrays.toString(boundaries));
-	}
+
 }

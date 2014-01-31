@@ -8,6 +8,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.brandeis.cs.lappsgrid.stanford.StanfordWebServiceException;
+import edu.brandeis.cs.lappsgrid.stanford.corenlp.Splitter;
 
 /**
  * <i>TestSplitter.java</i> Language Application Grids (<b>LAPPS</b>)
@@ -27,21 +28,12 @@ public class TestSplitter extends TestCase {
 	}
 	
 	@Test
-	public void testSentDetect() {
-		String [] sents = splitter.sentDetect("Hi. How are you? This is Mike.");
+	public void testSplit() {
+		String [] sents = splitter.split("Hi. How are you? This is Mike.");
 		System.out.println(Arrays.toString(sents));
-		String [] goldSents = {"Hi. How are you?","This is Mike."};
+		String [] goldSents = {"Hi.","How are you?","This is Mike."};
 		Assert.assertArrayEquals("Splitter Failure.", goldSents, sents);
 	}
 	
-	@Test
-	public void testSentDetectPos() {
-		Span[] offsets = splitter
-				.sentPosDetect("Hi. How are you? This is Mike.");
-		System.out.println(Arrays.toString(offsets));
-		Assert.assertEquals(
-				"Splitter Failure.",
-				"[[0..16), [17..30)]",
-				Arrays.toString(offsets));
-	}
+
 }

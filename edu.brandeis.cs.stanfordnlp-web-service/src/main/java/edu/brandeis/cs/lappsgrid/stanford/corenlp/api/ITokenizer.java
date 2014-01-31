@@ -17,5 +17,6 @@ public interface ITokenizer extends WebService  {
 	
 	public static final long [] TYPES_REQUIRES = new long[] { Types.STANFORD, Types.SENTENCE  };
 	public static final long [] TYPES_PRODUCES = new long[] { Types.STANFORD, Types.SENTENCE, Types.TOKEN };
-
+	
+	public String[] tokenize(String s);
 }
