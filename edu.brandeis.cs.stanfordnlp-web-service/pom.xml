@@ -84,6 +84,11 @@
 			<artifactId>vocabulary</artifactId>
 			<version>${vocabulary.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.anc.grid</groupId>
+			<artifactId>service-grid-libs</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
+		</dependency>
 		<!-- END LappsGrid -->
 
 		<dependency>
