@@ -28,7 +28,7 @@ public class TestPOSTagger extends TestCase {
 	@Test
 	public void testTokenize() {
 		String whitespaceTokenizerLine[] = WhitespaceTokenizer.INSTANCE
-				.tokenize("Hi. How are you? This is Mike.");
+				.tokenize("Hi. How are you? This, is Mike.");
 		String[] tags = postagger.tag(whitespaceTokenizerLine);
 		System.out.println(Arrays.toString(tags));
 		String [] goldTags = {"NNP", "WRB", "VBP", "JJ", "DT", "VBZ", "NNP"};

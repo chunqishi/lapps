@@ -115,7 +115,7 @@
 	</dependencies>
 
 	<build>
-		<finalName>stanfordcorenlp-web-service</finalName>
+		<finalName>stanfordnlp-web-service</finalName>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
