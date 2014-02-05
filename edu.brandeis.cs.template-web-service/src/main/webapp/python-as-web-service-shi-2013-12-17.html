@@ -1,0 +1,773 @@
+<!DOCTYPE HTML>
+<html>
+    <meta charset="utf-8" />
+    <head>
+    <title>Python As Web Services</title>    
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>             
+    <style>      
+        body, p, td, pre {
+            font-size: 14pt; }
+        
+        body {  
+            background-color:lightyellow; 
+            counter-reset: section subsection figure;}
+        
+        h1 {
+            text-align:center }
+        
+        h2 {
+            counter-increment: section; }    
+
+        h3 {
+            counter-increment: subsection; }
+        
+        h4 {
+            counter-increment: figure; }
+        
+        h2:before {
+            content:counter(section) ". "; }
+        
+        h3:before {
+            content:counter(section) "." counter(subsection) " "; }
+        
+        h4:before{
+            content:"Fig. " counter(section) "." counter(figure) " - ";}
+        
+        .reset {
+            counter-reset:subsection figure;}
+        
+        .nav-bar{
+            list-style-type:none;
+            margin:0;
+            padding:0; }
+        
+        img {
+            margin-left: 10pt;
+            border: thin solid gray; }
+        
+        .sample { 
+            background-color: black;
+            font-size: 12pt;
+            color:white;
+            padding: 4pt;
+            margin-left: 10pt;
+            margin-right: 30pt; 
+            display: block;
+            white-space: pre-line;}
+        
+        .code { 
+            padding: 4pt;
+            font-size: 12pt;
+            background-color: whitesmoke;
+            border: thin dotted gray;
+            margin-left: 10pt;
+            margin-right: 30pt; 
+            display: block; 
+            white-space: pre;}
+        
+        .author {
+            font-size: 16pt; 
+            text-align:center;}
+
+        
+        </style></head>
+<body>
+    <a name="_top_" />
+    <nav class="nav-bar">
+        <a href="#install-nltk">install nltk</a>
+        | 
+        <a href="#naive-bayes">naive bayes</a>
+        |
+        <a href="#java-interface">java interface</a>
+        |
+        <a href="#python-implement">python implement</a>
+        |
+        <a href="#service-wrapping">service wrapping</a>
+        
+        </nav>
+    
+    <h1>NLTK Python as Web Services</h1>
+    <p class="author">
+ Version <var>0.02</var>, <ruby>史 春奇 <rt> Chunqi Shi</rt></ruby>,  Jan. 2014</p>
+    
+    
+    
+<a name="install-nltk" />
+<h2>Install NLTK  <a href="#_top_" style="text-decoration: none;">^</a></h2>
+The <a href="http://nltk.org/">NLTK</a> provides Python tool kits for Natrual Language Processing.  How to wrap such python tools into Web service? This will be interesting. 
+
+To <a href="http://nltk.org/install.html">install NLTK</a> on MacBook, we need to know the version of Python.   After that, we download, setup and install NLTK package.  Before using NLTK, we need to test and <a href="http://nltk.org/data.html">install NLTK Data</a>.
+    
+    
+<samp class="sample">shis-MacBook-Air:~ shi$ python --version <span style="color:blue">&crarr;</span>
+Python 2.7.5
+shis-MacBook-Air:~ shi$ wget https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py <span style="color:blue">&crarr; (download <a href="https://pythonhosted.org/setuptools/easy_install.html" target="_blank">easy_install</a>)</span>
+--2013-12-02 16:24:31--  https://bitbucket.org/pypa/setuptools/raw/bootstrap/ez_setup.py 
+    ......
+2013-12-02 16:24:31 (118 MB/s) - ‘ez_setup.py’ saved [12155/12155]
+
+shis-MacBook-Air:~ shi$ python ez_setup.py --user    <span style="color:blue">&crarr;(install <a href="https://pythonhosted.org/setuptools/easy_install.html" target="_blank">easy_install</a>)</span>
+Downloading https://pypi.python.org/packages/source/s/setuptools/setuptools-1.4.2.tar.gz
+    ......
+Processing dependencies for setuptools==1.4.2
+Finished processing dependencies for setuptools==1.4.2    
+
+shis-MacBook-Air:~ shi$ shis-MacBook-Air:~ shi$ sudo /Users/shi/Library/Python/2.7/bin/easy_install pip<span style="color:blue">&crarr; (install <a href="http://en.wikipedia.org/wiki/Pip_%28package_manager%29" target="_blank">pip</a>)</span>
+Password:
+Searching for pip
+    ......
+Processing dependencies for pip
+Finished processing dependencies for pip
+shis-MacBook-Air:~ shi$ sudo /Users/shi/Library/Python/2.7/bin/pip install -U numpy<span style="color:blue">&crarr; (install <a href="http://www.numpy.org" target="_blank">numpy</a>) </span>
+......
+Successfully installed numpy
+Cleaning up...
+shis-MacBook-Air:~ shi$ sudo /Users/shi/Library/Python/2.7/bin/pip install -U pyyaml nltk<span style="color:blue">&crarr; (install <a href="https://pypi.python.org/pypi/PyYAML" target="_blank">nltk</a>)</span>  
+Downloading/unpacking pyyaml
+    ......
+Successfully installed pyyaml nltk
+Cleaning up...
+    
+shis-MacBook-Air:~ shi$ python <span style="color:blue">&crarr;</span>
+Python 2.7.5 (default, Aug 25 2013, 00:04:04)
+>>> import nltk <span style="color:blue">&crarr; (test nltk)</span>
+>>> nltk.download()  <span style="color:blue">&crarr; (download nltk data)</span>
+showing info http://nltk.github.com/nltk_data/
+True
+>>> from nltk.corpus import brown <span style="color:blue">&crarr;</span>
+>>> brown.words() <span style="color:blue">&crarr; (test nltk data)</span>
+['The', 'Fulton', 'County', 'Grand', 'Jury', 'said', ...]
+>>> 
+</samp>
+
+<figure>
+    <img src="python-as-web-service-shi-2013-12-17.img/img_nltk_download.png" alt="The NLTK Downloader" width="" height="">
+    <figcaption><h4> A view of NLTK downloader.</h4></figcaption></figure>    
+    
+<p>
+Here, we have installed the NLTK and Data package. 
+</p>    
+
+<a name="naive-bayes" />
+<h2>NLTK's Naive Bayes Classifier<a href="#_top_" style="text-decoration: none;">^</a></h2>
+      
+<p>NLTK has Naive Bayes classifiers, <a href="http://nltk.org/book/ch06.html" target="_blank">Chapter 6</a> describes details about calculating features, training, and evaluating.  The training and testing function will be wrapped into Web service.  Thus, we need Python programs for training and testing, and need Java programs for SOAP service. </p>    
+<h3 class="reset">NLTK Naive Bayes</h3>
+<p/>    
+<code class="code prettyprint linenums"># Example 6.7 (<a href="http://nltk.org/book/pylisting/code_consecutive_pos_tagger.py" target="_blank">code_consecutive_pos_tagger.py</a>)
+# Natural Language Toolkit: code_consecutive_pos_tagger
+
+ def pos_features(sentence, i, history): # [_consec-pos-tag-features]
+     features = {"suffix(1)": sentence[i][-1:],
+                 "suffix(2)": sentence[i][-2:],
+                 "suffix(3)": sentence[i][-3:]}
+     if i == 0:
+         features["prev-word"] = "&lt;START&gt;"
+         features["prev-tag"] = "&lt;START&gt;"
+     else:
+         features["prev-word"] = sentence[i-1]
+         features["prev-tag"] = history[i-1]
+     return features
+
+class ConsecutivePosTagger(nltk.TaggerI): # [_consec-pos-tagger]
+
+    def __init__(self, train_sents):
+        train_set = []
+        for tagged_sent in train_sents:
+            untagged_sent = nltk.tag.untag(tagged_sent)
+            history = []
+            for i, (word, tag) in enumerate(tagged_sent):
+                featureset = pos_features(untagged_sent, i, history)
+                train_set.append( (featureset, tag) )
+                history.append(tag)
+        self.classifier = nltk.NaiveBayesClassifier.train(train_set)
+
+    def tag(self, sentence):
+        history = []
+        for i, word in enumerate(sentence):
+            featureset = pos_features(sentence, i, history)
+            tag = self.classifier.classify(featureset)
+            history.append(tag)
+        return zip(sentence, history)
+</code>
+
+
+
+
+<!--
+	@brief:	step by step wrapping based on template project.
+
+-->
+
+<a name="java-interface" />
+<h2>Java Interface<a href="#_top_" style="text-decoration: none;">^</a></h2>
+<h3  class="reset">Git Project</h3>
+<p> We use <a href="http://git-scm.com/" target="_blank">Git</a> to manage the source code. After <a href="http://git-scm.com/downloads" target="_blank"> installation of Git </a>, you can <a href="https://help.github.com/articles/set-up-git" target="_blank" >set up Git</a>. Here we use <a href="https://github.com" target="_blank" >Github</a> to host the source code.   If you want to use <a href="https://help.github.com/articles/https-cloning-errors" target="_blank"> https protocol </a> to access GitHub, you need to make sure git version >= 1.7.10.  Then you could clone the repository <a href="https://github.com/chunqishi/lapps/tree/master/edu.brandeis.cs.template-web-service" target="_blank">lapps/edu.brandeis.cs.template-web-service/</a>
+</p>    
+<samp class="sample">[shicq@chilote lapps]$ git --version <span style="color:blue">&crarr;</span>
+git version 1.8.2.1
+[shicq@chilote lapps]$ git clone https://github.com/chunqishi/lapps.git <span style="color:blue">&crarr;</span>
+......
+[shicq@chilote chunqishi]$ cd lapps/edu.brandeis.cs.template-web-service/ <span style="color:blue">&crarr;</span>
+[shicq@chilote edu.brandeis.cs.template-web-service]$
+[shicq@chilote edu.brandeis.cs.template-web-service]$ find . <span style="color:blue">&crarr; (Display the directory tree)</span>
+.
+./pom.xml
+./src
+./src/main
+./src/main/resource
+./src/main/webapp
+./src/main/webapp/WEB-INF
+./src/main/webapp/WEB-INF/server-config.wsdd
+./src/main/webapp/WEB-INF/serviceimpl
+./src/main/webapp/WEB-INF/serviceimpl/template.xml
+./src/main/webapp/WEB-INF/web.xml
+./src/main/java
+./src/main/java/edu
+./src/main/java/edu/brandeis
+./src/main/java/edu/brandeis/cs
+./src/test
+./src/test/java
+./src/test/java/edu
+./src/test/java/edu/brandeis
+./src/test/java/edu/brandeis/cs
+
+[shicq@chilote edu.brandeis.cs.template-web-service]$ mvn validate <span style="color:blue">&crarr; (Maven validate)</span>
+[INFO] Scanning for projects...
+[shicq@chilote edu.brandeis.cs.template-web-service]$
+
+
+</samp>  
+
+<p>Then, We will define the Java Interface according to <a href="http://nltk.org/book/" target="_blank"> NLTK</a> Chapter 6  <a href="http://nltk.org/book/ch06.html" target="_blank">Learning to Classify  Text</a>.   </p>  According to this chapter, Supervised Learning contains (a) <b>Training</b> (b) <b>Prediction</b>.  Thus, there are at least two interface functions are needed.  
+
+<figure>
+    <img src="http://nltk.org/images/supervised-classification.png" alt="Supervised Classification. ">
+    <figcaption><h4><a href="http://nltk.org/book/ch06.html" target="_blank">Supervised Classification</a>. </h4></figcaption></figure>
+
+<p> Here, we define a Java Interface <b>IClassify.java</b>.  Meanwhile, we also define an exception process function, ClassifyException. 
+
+</p>
+
+<code class="code prettyprint linenums">package edu.brandeis.cs.nltk;
+
+import jp.go.nict.langrid.commons.rpc.intf.Service;
+
+/**
+ * @brief According to <a href="http://nltk.org/book/ch06.html" target="_blank">NLTK Chapter 6</a>
+ *        Two main interface <b>train</b> and <b>predict</b> are defined. Since features are always extracted from input. 
+ *        Thus, feature extractor is needed for further implementation.
+ * @author shicq@cs.brandeis.edu
+ *
+ */
+
+@Service(namespace="servicegrid:servicetype:brandeis:NLTKClassifier")
+public interface IClassify {
+	
+	/**
+	 * @brief train a classifier based on features. 
+	 * @refer <a href="http://nltk.org/book/ch06.html" target="_blank">Supervised Classification</a>
+	 * @return classifierID
+	 * @throws ClassifyException
+	 */
+	public String train(String featuresID) throws ClassifyException;
+	
+	/**
+	 * @brief predict classification label according to input using a trained model classifierID
+	 * @param input users's one input.
+	 * @param classifierID users set classifier. 
+	 * @return classification label.
+	 * @throws ClassifyException
+	 */
+	public String predict(String classifierID, String input) throws ClassifyException;
+
+	/**
+	 * 
+	 * @return existing feature sets.
+	 * @throws ClassifyException
+	 */
+	public String [] listFeatureSets() throws ClassifyException;
+}
+
+</code>
+
+
+<p> After this, we define two classifier for <em>Part-of-Speech Tagging</em>: <b>DecisionTreeClassifier</b> and <b>NaiveBayesClassifier</b>. 
+According Section <b>Part-of-Speech Tagging</b> of <a href="http://nltk.org/book/ch06.html" target="_blank">NLTK Chapter 6</a>, “we can train a classifier to work out which suffixes are most informative."
+Thus, our Java Interface will be implemented based on python programming. We define 2 Java Classes: DecisionTreeClassifier.java and NaiveBayesClassifier.java. 
+Before we implement them, we would like to define a common Python runner class: <b>PythonRunner.java</b>. Then we can define an abstract Python classifier class: <b>AbstractPythonClassifier.java</b>.
+</p>
+
+<a name="python-implement" />
+<h2>Python Implement<a href="#_top_" style="text-decoration: none;">^</a></h2>
+<h3  class="reset">Pyro Python Library</h3>
+<p>  We provided this Python/Java interface using <a href="http://pythonhosted.org/Pyro4/" target="_blank">Pyro4</a>.
+    We could <a href="http://pythonhosted.org/Pyro4/install.html" target="_blank">install</a> Pyro4 very easily.
+    For example, pip is used for installing pyro4.
+</p>
+
+<samp class="sample">[shicq@chilote Pyro4-4.22]$ pip install pyro4 <span style="color:blue">&crarr;</span>
+</samp>
+<p> Or using easy_install </p>
+<samp class="sample">[shicq@chilote Pyro4-4.22]$ easy_install pyro4 <span style="color:blue">&crarr;</span>
+</samp>
+
+
+
+<h3>Python Lapps Common IO</h3>
+<p> We provide a common library for easy usage.
+<a href="https://github.com/chunqishi/lapps/blob/master/edu.brandeis.cs.template-web-service/src/main/resources/lapps_common_io.py" target="_blank">lapps_common_io.py</a>.
+We provide <em>SectionRun</em> python class to allow run other functions from other python file, with help of configuration file
+    "<a href="https://github.com/chunqishi/lapps/blob/master/edu.brandeis.cs.template-web-service/src/main/resources/lapps.conf.template" target="_blank">lapps.conf</a>".
+
+For example, if you have an example Python file
+    "<a href="https://github.com/chunqishi/lapps/blob/master/edu.brandeis.cs.template-web-service/src/main/resources/examples/helloworld.py" target="_blank"> helloworld.py </a>".
+There are two functions: <b>append()</b> and <b>say()</b>. Function <b>say()</b> has global variable <em>hello</em>.
+    We show the configuration file to call function <b>say()</b> of helloworld.py.
+</p>
+<code class="code prettyprint linenums">import sys, os
+
+hello = "hello"
+
+def append(str1, str2):
+    return str1 + " " + str2
+
+def say(str):
+    return hello + " " + str
+</code>
+
+<p>
+Here are the lapps.conf to finish this task using lapps_common_io.py interface.
+    We define a section [helloworld.say]. We assign the global variable <em>hello</em> the string "hi".
+    The method is say. Arguments is a string "world".
+</p>
+
+<samp class="sample">[helloworld.say]
+PythonFile=example/helloworld.py
+Globals=hello:"hi"
+Method=say
+Args="world"
+</samp>
+
+Then we can call the configuration use
+    "<a href="https://github.com/chunqishi/lapps/blob/master/edu.brandeis.cs.template-web-service/src/main/resources/lapps_java_cmd.py" target="_blank">lapps_java_cmd.py</a>" interface.
+
+Using the provide <a href="https://github.com/chunqishi/lapps/blob/master/edu.brandeis.cs.template-web-service/src/main/java/edu/brandeis/cs/python/utils/PythonRunner.java" target="_blank">PythonRunner.java</a>,
+    we can call the lapps_java_cmd.py in the Java code.
+
+Then we define the Web service interface <a href="https://github.com/chunqishi/lapps/blob/master/edu.brandeis.cs.template-web-service/src/main/java/edu/brandeis/cs/python/examples/IHelloWorld.java" target="_blank">IHelloWorld.java</a>.
+</p>
+<code class="code prettyprint linenums">package edu.brandeis.cs.python.examples;
+
+import jp.go.nict.langrid.commons.rpc.intf.Service;
+import edu.brandeis.cs.python.utils.PythonRunnerException;
+
+/**
+ * @brief  Simple example to create a Python service.
+ * @file examples/helloworld.py
+ *
+ * @author shicq@cs.brandeis.edu
+ *
+ */
+
+
+@Service(namespace="servicegrid:servicetype:brandeis:HelloWorld")
+public interface IHelloWorld {
+        public String say(String world) throws PythonRunnerException;
+}
+
+</code>
+<p>
+    It is very easy to realize this interface with configured "lapps.conf".
+    We realize the <a href="https://github.com/chunqishi/lapps/blob/master/edu.brandeis.cs.template-web-service/src/main/java/edu/brandeis/cs/python/examples/HelloWorld.java" target="_blank">HelloWorld.java</a>.
+    We can see that implement a python caller service become very easy.
+</p>
+<code class="code prettyprint linenums">
+package edu.brandeis.cs.python.examples;
+
+import edu.brandeis.cs.python.utils.PythonRunner;
+import edu.brandeis.cs.python.utils.PythonRunnerException;
+
+public class HelloWorld implements IHelloWorld{
+        private PythonRunner pr = null;
+
+        public HelloWorld() throws PythonRunnerException{
+                pr = new PythonRunner();  //prepare the PythonRunner.
+        }
+
+        public HelloWorld(PythonRunner pr) throws PythonRunnerException{
+                this.pr = pr;
+        }
+
+        @Override
+        public String say(String world) throws PythonRunnerException {
+                String defSectionName = this.getClass().getCanonicalName();
+                String ret = pr.runPythonSection(defSectionName, world); // call section name [edu.brandeis.cs.python.examples.HelloWorld] in the lapps.conf.
+                return ret;
+        }
+
+        public String name(){
+                return this.getClass().getCanonicalName();
+        }
+}
+</code>
+
+<p>
+    Since we need to pass parameters into python caller. We have to change the lapps.conf file to mark the parameters.
+</p>
+
+<samp class="sample">[edu.brandeis.cs.python.examples.HelloWorld]
+PythonFile=example/helloworld.py
+Globals=hello:"hi"
+Method=say
+Args=%%1
+# <b>IMPORTANT:</b>
+# 1. Args %%1 will be replaced by the parameter "world" HelloWorld.java's function "public String say(String world)".
+# 2. Another &&1 will replaced as the reference to python object, which could be preloaded into the memory.
+# 3. The number following %% and && indicate the sequence of parameters from Java, starting from 1.
+</samp>
+
+<h3>NLTK Python Example</h3>
+<p>
+    For the nltk pos tagger example, we can call the function to realize the service in the similar way.
+    From this python function, all the features extracting, training and predicting are functions.
+    Then we could configure the lapps.conf file to invoke all the functions.
+</p>
+
+<code class="code prettyprint linenums">'''
+/**
+* @brief <b>examples/nltk_chapter6_pos_tagger.py</b>  train a classifier based on features.
+* @refer <a href="http://nltk.org/book/ch06.html" target="_blank">Supervised Classification</a>
+* @return classifierID
+* @throws ClassifyException
+*/'''
+
+import sys, os, io, time
+import nltk, cPickle as pickle
+
+from nltk.corpus import brown
+
+##
+#    @brief:    constants
+##
+MAX_FEATURESET_LEN = 200
+
+##
+#    @brief:    predict needs trained classifier module, feature extractor, and input
+##
+def predict(classifier, input):
+    return classifier.classify(pos_features(input))
+
+def get_common_suffixes():
+    suffix_fdist = nltk.FreqDist()
+    for word in brown.words():
+         word = word.lower()
+         suffix_fdist.inc(word[-1:])
+         suffix_fdist.inc(word[-2:])
+         suffix_fdist.inc(word[-3:])
+    common_suffixes = suffix_fdist.keys()[:100]
+    return common_suffixes
+
+common_suffixes = []
+
+def pos_features(inputWord):
+    features = {}
+    for suffix in common_suffixes:
+        features['endswith(%s)' % suffix] = inputWord.lower().endswith(suffix)
+    return features
+
+def features_brown_news():
+    tagged_words = brown.tagged_words(categories='news')
+    featuresets = [(pos_features(n), g) for (n,g) in tagged_words]
+    return featuresets
+
+
+def trainDecisionTreeClassifier(featuresets):
+    '''maximum MAX_FEATURESET_LEN(200)'''
+    _max = min(MAX_FEATURESET_LEN, len(featuresets))
+    _train_set = featuresets[1:_max]
+    _classifier = nltk.DecisionTreeClassifier.train(_train_set)
+    return _classifier
+
+def trainNaiveBayesClassifier(featuresets):
+    '''maximum MAX_FEATURESET_LEN(200)'''
+    _max = min(MAX_FEATURESET_LEN, len(featuresets))
+    _train_set = featuresets[1:_max]
+    _classifier = nltk.NaiveBayesClassifier.train(_train_set)
+    return _classifier
+</code>
+
+<p>
+    Then, we want to the interface of training and predicting.
+</p>
+
+<samp class="sample"><span style="color:orange">[edu.brandeis.cs.python.examples.nltk.common_suffixes]</span>
+<b>PythonFile</b>=examples/nltk_chapter6_pos_tagger.py
+<b>Method</b>=get_common_suffixes
+<b>Return</b>=common_suffixes
+<b>Dumps</b>=common_suffixes:edu.brandeis.cs.python.examples.nltk.common_suffixes/common_suffixes
+
+<span style="color:lightblue">[edu.brandeis.cs.python.examples.nltk.features_brown_news]</span>
+<b>Requires</b>=<span style="color:orange">edu.brandeis.cs.python.examples.nltk.common_suffixes</span>
+<b>Loads</b>=common_suffixes:edu.brandeis.cs.python.examples.nltk.common_suffixes/common_suffixes
+<b>PythonFile</b>=examples/nltk_chapter6_pos_tagger.py
+<b>Globals</b>=common_suffixes:common_suffixes
+<b>Method</b>=features_brown_news
+<b>Return</b>=features_brown_news
+<b>Dumps</b>=features_brown_news:edu.brandeis.cs.python.examples.nltk.features_brown_news/features_brown_news
+
+<span style="color:lightgreen">[edu.brandeis.cs.python.examples.nltk.DecisionTreeClassifier.train]</span>
+<b>Requires</b>=<span style="color:lightblue">edu.brandeis.cs.python.examples.nltk.features_brown_news</span>
+<b>Loads</b>=features_brown_news:edu.brandeis.cs.python.examples.nltk.features_brown_news/features_brown_news
+<b>PythonFile</b>=examples/nltk_chapter6_pos_tagger.py
+<b>Method</b>=trainDecisionTreeClassifier
+<b>Args</b>=&&1
+<b>Return</b>=classifier
+<b>Dumps</b>=classifier:edu.brandeis.cs.python.examples.nltk.DecisionTreeClassifier.train/classifier
+
+
+<span style="color:lightgreen">[edu.brandeis.cs.python.examples.nltk.DecisionTreeClassifier.predict]</span>
+<b>Loads</b>=features_brown_news:edu.brandeis.cs.python.examples.nltk.DecisionTreeClassifier.train/classifier
+<b>PythonFile</b>=examples/nltk_chapter6_pos_tagger.py
+<b>Method</b>=predict
+<b>Args</b>=&&1,%%2
+<b>Return</b>=tagger
+
+
+</samp>
+
+<p>
+    After that, we can easily realize the Java interface.
+</p>
+<code class="code prettyprint linenums">
+package edu.brandeis.cs.python.examples.nltk;
+
+import edu.brandeis.cs.python.utils.PythonRunner;
+import edu.brandeis.cs.python.utils.PythonRunnerException;
+
+
+/**
+ * @brief Decision Tree Classifier implementation using Python based nltk;
+ * @author shicq@cs.brandeis.edu
+ *
+ */
+public class DecisionTreeClassifier implements IClassify {
+	private PythonRunner pr = null;
+
+	public DecisionTreeClassifier() throws PythonRunnerException{
+		pr = new PythonRunner();
+	}
+
+	public DecisionTreeClassifier(PythonRunner pr) throws PythonRunnerException{
+		this.pr = pr;
+	}
+	@Override
+	public String train(String featuresID) throws PythonRunnerException {
+		pr.runPythonSection("edu.brandeis.cs.python.examples.nltk.DecisionTreeClassifier.train", featuresID);
+		return featuresID;
+	}
+
+	@Override
+	public String predict(String classifierID, String input)
+			throws PythonRunnerException {
+		String ret = pr.runPythonSection("edu.brandeis.cs.python.examples.nltk.DecisionTreeClassifier.predict", classifierID, input);
+		return ret;
+	}
+
+}
+</code>
+
+<h3>Configuration Detail</h3>
+<p>
+    Here, we want to detail the configuration for reference.
+</p>
+<samp class="sample">
+<span style="color:lightgreen">	## the name of default section </span>
+	[default]
+
+    <span style="color:lightgreen">	## set the pickle saving/loading directory </span>
+	PickleHome=
+
+        <span style="color:lightgreen">	## set the interface Python cmd function </span>
+	PythonInterface = lapps_java_cmd.py
+
+
+<span style="color:lightgreen">    ## an example section name </span>
+    [edu.brandeis.cs.example]
+
+    <span style="color:lightgreen">	## load pickle file into memory. </span>
+	Loads=name1:path_of_pickle1, name2:path_of_pickle2
+
+        <span style="color:lightgreen">	## set global variable need in the function </span>
+	Globals=global1:"Hello",global2:name2
+
+            <span style="color:lightgreen">	## running required sections before this function </span>
+	Requires=edu.brandeis.cs.example1,edu.brandeis.cs.example2
+
+    <span style="color:lightgreen">	## the Python file has the target function </span>
+	PythonFile=directory/example.py
+
+    <span style="color:lightgreen">	## the target function name </span>
+	Method=run_example
+
+<span style="color:lightgreen">	## the arguments need for this function:
+    ## %%1 will be replaced by the 1st parameter passed from Java interface, %%1 will be Python object (char strings, numeric numbers).
+    ## &&2 will be replaced by the 2nd parameter passed from Java interface, &&2 will be Python reference/name of global variable (loaded python object). </span>
+	Args=%%1, "world",  &&2
+
+<span style="color:lightgreen">		## the return reference </span>
+	Return=ret
+
+<span style="color:lightgreen">		## dump needed data into pickle file. </span>
+	Dumps=ret:path_of_pickle
+
+</samp>
+
+
+
+
+
+<a name="service-wrapping" />
+<h2>Web Service Wrapping<a href="#_top_" style="text-decoration: none;">^</a></h2>
+
+<p> We can config the Web service XML.
+</p>
+
+<textarea rows="12" cols="100" class="code prettyprint linenums" style="border:none;">
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+<beans>
+  <bean id="target" class="jp.go.nict.langrid.servicecontainer.handler.TargetServiceFactory" >
+    <property name="service">
+      <bean class="edu.brandeis.cs.nltk.classifier.NaiveBayesClassifier" />
+    </property>
+  </bean>
+</beans>
+</textarea>
+
+<p>
+Then, we can deploy and run <em>mvn package</em> to package the war: <b>nltk-web-service.war</b>.
+</p>
+
+<samp class="sample">
+[shicq@chilote edu.brandeis.cs.nltk-web-service]$ mvn clean;mvn package;<span style="color:blue">&crarr; (clean and package war)</span>
+......
+[INFO] Copying webapp resources [/home/j/llc/shicq/Project/chunqishi/lapps/edu.brandeis.cs.nltk-web-service/src/main/webapp]
+[INFO] Webapp assembled in [34280 msecs]
+[INFO] Building war: /home/j/llc/shicq/Project/chunqishi/lapps/edu.brandeis.cs.nltk-web-service/target/nltk-web-service.war
+[INFO] WEB-INF/web.xml already added, skipping
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD SUCCESS
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time: 1:27.234s
+[INFO] Finished at: Fri Dec 06 20:06:49 EST 2013
+[INFO] Final Memory: 13M/238M
+</samp>
+
+<p>
+We can deploy this war package into <a href="http://tomcat.apache.org/" target="_blank">Tomcat</a>. Copy the nltk-web-service.war into $TOMCAT_HOME/webapps, and start the tomcat server. 
+</p>
+
+<samp class="sample">
+[shicq@chilote apache-tomcat-6.0.37]$ bin/shutdown.sh <span style="color:blue">&crarr;</span>
+Using CATALINA_BASE:   /home/j/llc/shicq/Softwares/apache-tomcat-6.0.37
+Using CATALINA_HOME:   /home/j/llc/shicq/Softwares/apache-tomcat-6.0.37
+......
+[shicq@chilote apache-tomcat-6.0.37]$ mv /home/j/llc/shicq/Project/chunqishi/lapps/edu.brandeis.cs.nltk-web-service/target/nltk-web-service.war webapps/
+[shicq@chilote apache-tomcat-6.0.37]$ bin/startup.sh <span style="color:blue">&crarr;</span>
+Using CATALINA_BASE:   /home/j/llc/shicq/Softwares/apache-tomcat-6.0.37
+Using CATALINA_HOME:   /home/j/llc/shicq/Softwares/apache-tomcat-6.0.37
+
+</samp>
+
+<p>
+Now, we could visit <a href="http://eldrad.cs-i.brandeis.edu:8080/" target="_blank">http://localhost:8080/</a>, and find out that tomcat is running. 
+Then, we could open <a href="http://eldrad.cs-i.brandeis.edu:8080/nltk-web-service/jsServices" target="_blank">http://localhost:8080/nltk-web-service/jsServices</a> to invoke the JSON-RPC Web service.
+
+</p>
+
+
+<figure>
+    <img src="python-as-web-service-shi-2013-12-17.img/img_jsonrpc_services.png" alt="JSON RPC Services" width="" height="">
+    <figcaption><h4><a href="http://eldrad.cs-i.brandeis.edu:8080/nltk-web-service/jsServices" target="_blank">JSON RPC Services.</a></h4></figcaption></figure>    
+    
+<figure>
+    <img src="python-as-web-service-shi-2013-12-17.img/img_naivebayes_listfeaturesets.png" alt="Naive Bayes Services" width="" height="">
+    <figcaption><h4><a href="http://eldrad.cs-i.brandeis.edu:8080/nltk-web-service/jsServices" target="_blank">Availabe Feature Sets.</a></h4></figcaption></figure>    
+    
+<p> After, we list all the feature sets, we can train a classifier using the available feature set (e.g. <b>"features_brown_news"</b>).
+Since it is too complicated to design scalable feature extractors. Currently, we just provide users default available feature sets. 
+</p>
+
+<figure>
+    <img src="python-as-web-service-shi-2013-12-17.img/img_naivebayes_train.png" alt="Naive Bayes Services" width="" height="">
+    <figcaption><h4><a href="http://eldrad.cs-i.brandeis.edu:8080/nltk-web-service/jsServices" target="_blank">Training Naive Bayes Classifier.</a></h4></figcaption></figure>    
+
+<p>After the training, We can test this naive bayes classifier <b>"features_brown_news"</b>. We input a name <b>"dogs"</b>. It will output the POST Tagger <b>"NNS"</b>.
+
+</p>
+<figure>
+    <img src="python-as-web-service-shi-2013-12-17.img/img_naivebayes_predict.png" alt="Naive Bayes Services" width="" height="">
+    <figcaption><h4><a href="http://eldrad.cs-i.brandeis.edu:8080/nltk-web-service/jsServices" target="_blank">Testing Naive Bayes Classifier.</a></h4></figcaption></figure>    
+
+
+<p> Finally, all the codes are available from Github
+    <a href="https://github.com/chunqishi/lapps/tree/master/edu.brandeis.cs.template-web-service" target="_blank">edu.brandeis.cs.template-web-service</a>.
+You can git clone for details.
+</p>
+<samp class="sample">
+[shicq@chilote lapps]$ git clone https://github.com/chunqishi/lapps.git<span style="color:blue">&crarr;(clone template-web-service)</span>
+[shicq@chilote chunqishi]$ cd lapps/edu.brandeis.cs.template-web-service/<span style="color:blue">&crarr;</span>
+[shicq@chilote edu.brandeis.cs.template-web-service]$
+</samp>
+
+<p>
+    Then, we could run mvn for package, and jetty:run for local web service testing.
+</p>
+
+<samp class="sample">
+[shicq@chilote edu.brandeis.cs.template-web-service]$ mvn package; mvn jetty:run <span style="color:blue">&crarr;(package war, and start jetty server)</span>
+...
+[INFO] Webapp directory = /home/j/llc/shicq/Project/chunqishi/lapps/edu.brandeis.cs.template-web-service/src/main/webapp
+[INFO] Starting jetty 6.1.10 ...
+[INFO] jetty-6.1.10
+[INFO] No Transaction manager found - if your webapp requires one, please configure one.
+[INFO] Started SelectChannelConnector@0.0.0.0:4040
+[INFO] Started Jetty Server
+[INFO] Starting scanner at interval of 10 seconds.
+Jan 13, 2014 11:27:50 AM org.springframework.context.support.AbstractApplicationContext prepareRefresh
+INFO: Refreshing jp.go.nict.langrid.servicecontainer.spring.WebappXmlApplicationContext@1ed14d8c: startup date [Mon Jan 13 11:27:50 EST 2014]; root of context hierarchy
+</samp>
+
+
+<p>
+    Finally, we could visit local service through
+    <a href="http://localhost:4040/template-web-service/jsServices" target="_blank">http://localhost:4040/template-web-service/jsServices</a>.
+</p>
+<!--
+    
+<figure>
+    <img src="img_pulpit.jpg" alt="The Pulpit Rock" width="304" height="228">
+    <figcaption><h4> A view of the pulpit rock in Norway.</h4></figcaption></figure>
+    
+    <h3/>
+    <h3/>
+    <h4/>
+    <h2></h2>
+    <h3 class="reset"/>
+    <h3/>
+    <h4 class="reset" />
+    <h4/>
+-->    
+    
+<footer><hr/> 
+<p>
+    Progress: 
+    <progress value="80" max="100"></progress></p>
+<p>
+    Contacts: 
+    <nonsense>shi</nonsense>cq@<nonsense>cs.</nonsense>brandeis.<nonsense></nonsense>edu,
+    <nonsense>mar</nonsense>c@<nonsense>cs.</nonsense>brandeis.<nonsense></nonsense>edu,
+    <nonsense>jam</nonsense>esp@<nonsense>cs.</nonsense>brandeis.<nonsense></nonsense>edu</p></footer>
+    
+    </body></html>
