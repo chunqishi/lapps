@@ -36,7 +36,7 @@ import org.lappsgrid.vocabulary.*;
  */
 public class JsonSplitter implements ISplitter
 {
-   protected static final Logger logger = LoggerFactory.getLogger(Splitter.class);
+   protected static final Logger logger = LoggerFactory.getLogger(JsonSplitter.class);
 
    private SentenceDetector sentenceDetector;
 
