@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import edu.brandeis.cs.lappsgrid.util.JsonUtil;
 import opennlp.tools.sentdetect.SentenceDetector;
 import opennlp.tools.sentdetect.SentenceDetectorME;
 import opennlp.tools.sentdetect.SentenceModel;
@@ -15,6 +16,7 @@ import org.anc.lapps.serialization.ProcessingStep;
 import org.anc.resource.ResourceLoader;
 import org.anc.util.IDGenerator;
 import org.lappsgrid.api.Data;
+import org.lappsgrid.api.LappsException;
 import org.lappsgrid.core.DataFactory;
 import org.lappsgrid.discriminator.DiscriminatorRegistry;
 import org.lappsgrid.discriminator.Types;
@@ -109,17 +111,20 @@ public class JsonSplitter implements ISplitter
          }
       }
 
-      if (data.getDiscriminator() != Types.TEXT)
+      Container container = null;
+      try
       {
-         String type = DiscriminatorRegistry.get(data.getDiscriminator());
-         logger.error("execute(): Invalid input, expected TEXT, found " + type);
-         return DataFactory.error("execute(): Invalid input, expected TEXT, found " + type);
+         container = JsonUtil.getContainer(data);
+      }
+      catch (LappsException e)
+      {
+         return DataFactory.error(e.getMessage());
       }
 
       //String[] sentences = sentDetect(data.getPayload());
-      Span[] spans = sentPosDetect(data.getPayload());
+      Span[] spans = sentPosDetect(container.getText());
       ProcessingStep step = new ProcessingStep();
-      step.getMetadata().put(Metadata.PRODUCED_BY, "OpenNLP JSON Splitter.");
+      step.getMetadata().put(Metadata.PRODUCED_BY, this.getClass().getName());
       IDGenerator id = new IDGenerator();
       for (Span span : spans) {
          Annotation a = new Annotation();
@@ -129,8 +134,6 @@ public class JsonSplitter implements ISplitter
          a.setEnd(span.getEnd());
          step.addAnnotation(a);
       }
-      Container container = new Container();
-      container.setText(data.getPayload());
       container.getSteps().add(step);
       logger.info("execute(): Execute OpenNLP SentenceDetector!");
       //return DataFactory.stringList(sentences);

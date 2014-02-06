@@ -80,7 +80,7 @@ public class FileLoadUtil {
 	public static final ClassLoader getClassLoader() {
 		ClassLoader loader = Thread.currentThread().getContextClassLoader();
 		if (loader == null) {
-			loader = ResourceLoader.class.getClassLoader();
+			loader = FileLoadUtil.class.getClassLoader();
 		}
 		return loader;
 	}
