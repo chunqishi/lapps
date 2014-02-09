@@ -131,6 +131,7 @@ public class JsonTokenizer implements ITokenizer
          a.setStart(token.getStart());
          a.setEnd(token.getEnd());
          a.setLabel(Annotations.TOKEN);
+         step.addAnnotation(a);
       }
       container.getSteps().add(step);
       return DataFactory.json(container.toJson());
