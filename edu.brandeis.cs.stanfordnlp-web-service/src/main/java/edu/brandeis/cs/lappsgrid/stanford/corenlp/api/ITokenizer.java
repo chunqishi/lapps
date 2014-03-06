@@ -15,7 +15,7 @@ import org.lappsgrid.discriminator.Types;
 public interface ITokenizer extends WebService  {
 	public static final String PROP_COMPNENT_MODEL = "Tokenizer";
 	
-	public static final long [] TYPES_REQUIRES = new long[] { Types.STANFORD, Types.SENTENCE  };
+	public static final long [] TYPES_REQUIRES = new long[] { Types.SENTENCE  };
 	public static final long [] TYPES_PRODUCES = new long[] { Types.STANFORD, Types.SENTENCE, Types.TOKEN };
 	
 	public String[] tokenize(String s);

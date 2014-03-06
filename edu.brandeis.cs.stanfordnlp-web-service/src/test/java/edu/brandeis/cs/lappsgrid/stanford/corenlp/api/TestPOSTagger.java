@@ -19,10 +19,10 @@ import edu.brandeis.cs.lappsgrid.stanford.corenlp.POSTagger;
  * @author Chunqi Shi ( <i>shicq@cs.brandeis.edu</i> )<br>Nov 20, 2013<br>
  * 
  */
-public class TestPOSTagger extends TestCase {
+public class TestPOSTagger extends TestService {
 	
 	POSTagger postagger;
-	
+
 	public TestPOSTagger() throws StanfordWebServiceException {
 		postagger = new POSTagger();
 	}
@@ -31,9 +31,19 @@ public class TestPOSTagger extends TestCase {
 	public void testTokenize() {
 		String docs = "Hi. How are you? This is Mike.";
 		String[] tags = postagger.tag(docs);
-		System.out.println(Arrays.toString(tags));
 		String [] goldTags = {"NN", ".", "WRB", "VBP", "PRP", ".", "DT", "VBZ", "NNP", "."};
 		Assert.assertArrayEquals("Tokenize Failure.", goldTags, tags);
 	}
+
+    @Test
+    public void testExecute(){
+        ret = postagger.execute(data);
+//        System.out.println(ret.getPayload());
+        Assert.assertTrue(ret.getPayload().contains("NN"));
+        Assert.assertTrue(ret.getPayload().contains("by return email or by telephone"));
+    }
+
+
+
 
 }

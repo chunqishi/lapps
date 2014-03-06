@@ -2,8 +2,14 @@ package edu.brandeis.cs.lappsgrid.stanford.corenlp;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import edu.stanford.nlp.ling.CoreAnnotations;
+import org.anc.lapps.serialization.Container;
+import org.anc.lapps.serialization.ProcessingStep;
+import org.anc.util.IDGenerator;
 import org.lappsgrid.api.Data;
+import org.lappsgrid.api.LappsException;
 import org.lappsgrid.core.DataFactory;
 import org.lappsgrid.discriminator.Types;
 
@@ -13,12 +19,15 @@ import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.util.CoreMap;
+import org.lappsgrid.vocabulary.Annotations;
+import org.lappsgrid.vocabulary.Features;
+import org.lappsgrid.vocabulary.Metadata;
 
 public class Tokenizer extends AbstractStanfordCoreNLPWebService implements
 		ITokenizer {
 
 	public Tokenizer() {
-		super();
+        this.init(PROP_TOKENIZE, PROP_SENTENCE_SPLIT);
 	}
 
 	@Override
@@ -31,15 +40,46 @@ public class Tokenizer extends AbstractStanfordCoreNLPWebService implements
 		return TYPES_PRODUCES;
 	}
 
-
 	@Override
 	public Data execute(Data input) {
-		if (input.getDiscriminator() == Types.ERROR) {
-			return input;
-		}
-		String[] tokens = tokenize(input.getPayload());
-		Data data = DataFactory.stringList(tokens);
-		return data;
+        Container container = null;
+        try {
+            container = getContainer(input);
+        } catch (LappsException e) {
+            return DataFactory.error(e.getMessage());
+        }
+
+        // steps
+        ProcessingStep step = new ProcessingStep();
+        // steps metadata
+        step.getMetadata().put(Metadata.PRODUCED_BY, this.getClass().getName() );
+        step.getMetadata().put(Metadata.CONTAINS, Features.PART_OF_SPEECH);
+
+        //
+        IDGenerator id = new IDGenerator();
+
+        // NLP processing
+        Annotation annotation = new Annotation(container.getText());
+        snlp.annotate(annotation);
+
+        //
+        List<CoreMap> sentences = annotation.get(SentencesAnnotation.class);
+        for (CoreMap sentence1 : sentences) {
+            for (CoreLabel token : sentence1.get(TokensAnnotation.class)) {
+                org.anc.lapps.serialization.Annotation ann =
+                        new org.anc.lapps.serialization.Annotation();
+                ann.setId(id.generate("tok"));
+                ann.setStart(token.beginPosition());
+                ann.setEnd(token.endPosition());
+                ann.setLabel(Annotations.TOKEN);
+                Map<String, String> features = ann.getFeatures();
+                features.put(Features.LEMMA, token.lemma());
+                features.put("word", token.value());
+                step.addAnnotation(ann);
+            }
+        }
+        container.getSteps().add(step);
+        return DataFactory.json(container.toJson());
 	}
 
 	@Override
@@ -58,6 +98,5 @@ public class Tokenizer extends AbstractStanfordCoreNLPWebService implements
 		// return null;
 		return list.toArray(new String[list.size()]);
 	}
-
 
 }
