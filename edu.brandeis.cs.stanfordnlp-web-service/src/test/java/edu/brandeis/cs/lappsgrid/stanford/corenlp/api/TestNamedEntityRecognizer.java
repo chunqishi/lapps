@@ -29,11 +29,11 @@ public class TestNamedEntityRecognizer extends TestService {
 		ner = new NamedEntityRecognizer();
 	}
 
+
 	@Test
 	public void testFind() {
 		String text = "Mike, Smith is a good person and he is from Boston.";
 		String ners = ner.find(text);
-//		System.out.println(ners);
 		Assert.assertEquals(
 				"NamedEntityRecognizer Failure.",
 				ners,

@@ -15,7 +15,7 @@ import org.lappsgrid.discriminator.Types;
 public interface ITokenizer extends opennlp.tools.tokenize.Tokenizer, WebService  {
 	public static final String PROP_COMPNENT_MODEL = "Tokenizer";
 	
-	public static final long [] TYPES_REQUIRES = new long[] { Types.OPENNLP, Types.SENTENCE  };
+	public static final long [] TYPES_REQUIRES = new long[] { Types.SENTENCE  };
 	public static final long [] TYPES_PRODUCES = new long[] { Types.OPENNLP, Types.SENTENCE, Types.TOKEN };
 
 }

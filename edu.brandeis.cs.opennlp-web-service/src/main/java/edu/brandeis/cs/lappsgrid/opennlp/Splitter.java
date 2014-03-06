@@ -2,18 +2,27 @@ package edu.brandeis.cs.lappsgrid.opennlp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Properties;
 
+import edu.brandeis.cs.lappsgrid.api.opennlp.IVersion;
 import opennlp.tools.sentdetect.SentenceDetector;
 import opennlp.tools.sentdetect.SentenceDetectorME;
 import opennlp.tools.sentdetect.SentenceModel;
 import opennlp.tools.util.Span;
 
+import org.anc.lapps.serialization.Container;
+import org.anc.lapps.serialization.ProcessingStep;
 import org.anc.resource.ResourceLoader;
+import org.anc.util.IDGenerator;
 import org.lappsgrid.api.Data;
+import org.lappsgrid.api.LappsException;
 import org.lappsgrid.core.DataFactory;
 import org.lappsgrid.discriminator.DiscriminatorRegistry;
 import org.lappsgrid.discriminator.Types;
+import org.lappsgrid.vocabulary.Annotations;
+import org.lappsgrid.vocabulary.Features;
+import org.lappsgrid.vocabulary.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,14 +37,15 @@ import edu.brandeis.cs.lappsgrid.api.opennlp.ISplitter;
  * @author Chunqi Shi ( <i>shicq@cs.brandeis.edu</i> )<br>Nov 20, 2013<br>
  * 
  */
-public class Splitter implements ISplitter {
+public class Splitter  extends AbstractWebService implements ISplitter {
     protected static final Logger logger = LoggerFactory.getLogger(Splitter.class);
     
-    private SentenceDetector sentenceDetector;
+    private static SentenceDetector sentenceDetector;
     
     
 	public Splitter() throws OpenNLPWebServiceException {
-		init();
+        if (sentenceDetector == null)
+		    init();
 	}
     
 	protected void init() throws OpenNLPWebServiceException {
@@ -92,16 +102,35 @@ public class Splitter implements ISplitter {
 	public Data execute(Data data) {
 		logger.info("execute(): Execute OpenNLP SentenceDetector ...");
 
-		if (sentenceDetector == null) {
-			try {
-				init();
-			} catch (OpenNLPWebServiceException e) {
-				logger.error("execute(): Fail to initialize SentenceDetector");
-				return DataFactory
-						.error("execute(): Fail to initialize SentenceDetector");
-			}
-		}
-		
+        Container container = null;
+        try {
+            container = getContainer(data);
+        } catch (LappsException e) {
+            return DataFactory.error(e.getMessage());
+        }
+
+        String[] sentences = sentDetect(data.getPayload());
+
+        // steps
+        ProcessingStep step = new ProcessingStep();
+        // steps metadata
+        step.getMetadata().put(Metadata.PRODUCED_BY, this.getClass().getName() + ":" + VERSION);
+        step.getMetadata().put(Metadata.CONTAINS, "Splitter");
+
+        //
+        IDGenerator id = new IDGenerator();
+
+        for (String sentence: sentences) {
+            org.anc.lapps.serialization.Annotation ann =
+                    new org.anc.lapps.serialization.Annotation();
+            ann.setId(id.generate("tok"));
+            ann.setLabel(Annotations.SENTENCE);
+            Map<String, String> features = ann.getFeatures();
+            putFeature(features, "Sentence", sentence);
+
+            step.addAnnotation(ann);
+        }
+
 	    if (data.getDiscriminator() != Types.TEXT)
 	    {
 	         String type = DiscriminatorRegistry.get(data.getDiscriminator());
@@ -109,9 +138,10 @@ public class Splitter implements ISplitter {
 	         return DataFactory.error("execute(): Invalid input, expected TEXT, found " + type);
 	    }
 
-		String[] sentences = sentDetect(data.getPayload());
+
 		logger.info("execute(): Execute OpenNLP SentenceDetector!");
-		return DataFactory.stringList(sentences);
+        container.getSteps().add(step);
+        return DataFactory.json(container.toJson());
 	}
 	
 	@Override

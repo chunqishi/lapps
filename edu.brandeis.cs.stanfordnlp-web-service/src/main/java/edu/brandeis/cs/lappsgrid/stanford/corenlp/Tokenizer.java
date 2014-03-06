@@ -53,7 +53,7 @@ public class Tokenizer extends AbstractStanfordCoreNLPWebService implements
         ProcessingStep step = new ProcessingStep();
         // steps metadata
         step.getMetadata().put(Metadata.PRODUCED_BY, this.getClass().getName() + ":" + Version);
-        step.getMetadata().put(Metadata.CONTAINS, Features.PART_OF_SPEECH);
+        step.getMetadata().put(Metadata.CONTAINS, "Token");
 
         //
         IDGenerator id = new IDGenerator();
@@ -75,8 +75,7 @@ public class Tokenizer extends AbstractStanfordCoreNLPWebService implements
                 Map<String, String> features = ann.getFeatures();
 
                 putFeature(features, Features.LEMMA, token.lemma());
-                putFeature(features, "word", token.value());
-
+                putFeature(features, Features.WORD, token.value());
                 step.addAnnotation(ann);
             }
         }

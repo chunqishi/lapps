@@ -97,10 +97,10 @@ public class NamedEntityRecognizer extends AbstractStanfordCoreNLPWebService
                 Map<String, String> features = ann.getFeatures();
 
                 putFeature(features, Features.LEMMA, token.lemma());
-                putFeature(features, "category", token.category());
+                putFeature(features, Features.CATEGORY, token.category());
                 putFeature(features, Features.PART_OF_SPEECH, token.get(CoreAnnotations.PartOfSpeechAnnotation.class));
-                putFeature(features, "ner", token.ner());
-                putFeature(features, "word", token.word());
+                putFeature(features, Features.NER, token.ner());
+                putFeature(features, Features.WORD, token.word());
                 step.addAnnotation(ann);
             }
         }

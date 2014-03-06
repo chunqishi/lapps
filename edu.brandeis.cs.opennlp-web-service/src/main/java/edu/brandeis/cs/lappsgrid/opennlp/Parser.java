@@ -2,16 +2,27 @@ package edu.brandeis.cs.lappsgrid.opennlp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Properties;
 
+import edu.brandeis.cs.lappsgrid.api.opennlp.IVersion;
 import opennlp.tools.cmdline.parser.ParserTool;
 import opennlp.tools.parser.Parse;
 import opennlp.tools.parser.ParserFactory;
 import opennlp.tools.parser.ParserModel;
 
+import org.anc.lapps.serialization.Container;
+import org.anc.lapps.serialization.ProcessingStep;
 import org.anc.resource.ResourceLoader;
+import org.anc.util.IDGenerator;
 import org.lappsgrid.api.Data;
+import org.lappsgrid.api.LappsException;
 import org.lappsgrid.core.DataFactory;
+import org.lappsgrid.discriminator.DiscriminatorRegistry;
+import org.lappsgrid.discriminator.Types;
+import org.lappsgrid.vocabulary.Annotations;
+import org.lappsgrid.vocabulary.Features;
+import org.lappsgrid.vocabulary.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,14 +41,15 @@ import edu.brandeis.cs.lappsgrid.api.opennlp.IParser;
  *         Nov 20, 2013<br>
  * 
  */
-public class Parser implements IParser {
+public class Parser extends AbstractWebService implements IParser {
 	protected static final Logger logger = LoggerFactory
 			.getLogger(Parser.class);
 
-	private opennlp.tools.parser.Parser parser;
+	private static opennlp.tools.parser.Parser parser;
 
 	public Parser() throws OpenNLPWebServiceException {
-		init();
+        if (parser == null)
+		    init();
 	}
 
 	protected void init() throws OpenNLPWebServiceException {
@@ -102,19 +114,38 @@ public class Parser implements IParser {
 	public Data execute(Data data) {
 		logger.info("execute(): Execute OpenNLP Parser ...");
 
-		if (parser == null) {
-			try {
-				init();
-			} catch (OpenNLPWebServiceException e) {
-				logger.error("execute(): Fail to initialize Parser");
-				return DataFactory
-						.error("execute(): Fail to initialize Parser");
-			}
-		}
+        Container container = null;
+        try {
+            container = getContainer(data);
+        } catch (LappsException e) {
+            return DataFactory.error(e.getMessage());
+        }
 
-		String parser = parse(data.getPayload());
-		logger.info("execute(): Execute OpenNLP Parser!");
-		return DataFactory.text(parser);
+        // steps
+        ProcessingStep step = new ProcessingStep();
+        // steps metadata
+        step.getMetadata().put(Metadata.PRODUCED_BY, this.getClass().getName() + ":" + VERSION);
+        step.getMetadata().put(Metadata.CONTAINS, "Splitter");
+
+        //
+        IDGenerator id = new IDGenerator();
+
+        Parse parses[] = ParserTool.parseLine(data.getPayload(), parser, 1);
+        StringBuffer builder = new StringBuffer();
+        for (int pi = 0, pn = parses.length; pi < pn; pi++) {
+            builder.setLength(0);
+            parses[pi].show(builder);
+            org.anc.lapps.serialization.Annotation ann =
+                    new org.anc.lapps.serialization.Annotation();
+            ann.setId(id.generate("tok"));
+            ann.setLabel(Annotations.TOKEN);
+            Map<String, String> features = ann.getFeatures();
+            putFeature(features, Features.PART_OF_SPEECH, builder.toString());
+            step.addAnnotation(ann);
+        }
+
+        container.getSteps().add(step);
+        return DataFactory.json(container.toJson());
 	}
 
 	@Override

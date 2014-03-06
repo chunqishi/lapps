@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
+import edu.brandeis.cs.lappsgrid.api.opennlp.IVersion;
 import opennlp.tools.chunker.ChunkSample;
 import opennlp.tools.chunker.Chunker;
 import opennlp.tools.chunker.ChunkerME;
@@ -74,7 +75,7 @@ import edu.brandeis.cs.lappsgrid.util.SplitMergeUtil;
  * @author Chunqi Shi ( <i>shicq@cs.brandeis.edu</i> )<br>Nov 21, 2013<br>
  * 
  */
-public class OpenNLP implements IOpenNLP {
+public class OpenNLP implements IOpenNLP , IVersion {
 	protected static final Logger logger = LoggerFactory
 			.getLogger(OpenNLP.class);
 

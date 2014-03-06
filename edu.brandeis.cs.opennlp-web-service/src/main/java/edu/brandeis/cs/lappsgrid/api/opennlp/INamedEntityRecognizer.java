@@ -15,6 +15,7 @@ import org.lappsgrid.discriminator.Types;
  * 
  */
 public interface INamedEntityRecognizer extends WebService {
+
 	public static final String PROP_COMPNENT_MODEL = "Name-Finder";
 	public static final String TOKEN_SPAN_SPLIT = ":";
 	
