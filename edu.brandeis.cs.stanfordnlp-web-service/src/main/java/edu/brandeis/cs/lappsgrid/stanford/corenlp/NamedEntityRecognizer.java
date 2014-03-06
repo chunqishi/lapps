@@ -69,7 +69,7 @@ public class NamedEntityRecognizer extends AbstractStanfordCoreNLPWebService
         // steps
         ProcessingStep step = new ProcessingStep();
         // steps metadata
-        step.getMetadata().put(Metadata.PRODUCED_BY, this.getClass().getName());
+        step.getMetadata().put(Metadata.PRODUCED_BY, this.getClass().getName() + ":" + Version);
         step.getMetadata().put(Metadata.CONTAINS, Annotations.NE);
 
         //
@@ -95,11 +95,12 @@ public class NamedEntityRecognizer extends AbstractStanfordCoreNLPWebService
                 ann.setLabel(Annotations.TOKEN);
 
                 Map<String, String> features = ann.getFeatures();
-                features.put(Features.LEMMA, token.lemma());
-                features.put("category", token.category());
-                features.put(Features.PART_OF_SPEECH, token.get(CoreAnnotations.PartOfSpeechAnnotation.class));
-                features.put("ner", token.ner());
-                features.put("word", token.word());
+
+                putFeature(features, Features.LEMMA, token.lemma());
+                putFeature(features, "category", token.category());
+                putFeature(features, Features.PART_OF_SPEECH, token.get(CoreAnnotations.PartOfSpeechAnnotation.class));
+                putFeature(features, "ner", token.ner());
+                putFeature(features, "word", token.word());
                 step.addAnnotation(ann);
             }
         }

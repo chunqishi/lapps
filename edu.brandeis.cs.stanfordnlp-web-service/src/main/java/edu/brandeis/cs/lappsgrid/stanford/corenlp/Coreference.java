@@ -51,8 +51,7 @@ public class Coreference extends AbstractStanfordCoreNLPWebService implements
 	    pipeline.annotate(document);
 	    Map<Integer, CorefChain> graph = document.get(CorefChainAnnotation.class);
 	    ProcessingStep step = new ProcessingStep();
-	    step.getMetadata().put(Metadata.PRODUCED_BY, "Stanford NER");
-	    
+        putFeature(step.getMetadata(), Metadata.PRODUCED_BY, "Stanford NER");
 //	    pipeline.prettyPrint(d, os);
 	    
 	    
@@ -61,6 +60,7 @@ public class Coreference extends AbstractStanfordCoreNLPWebService implements
 //	    return data;
 	    return null;
 	}
+
 	// public static void main(String[]args) {
 	// // creates a StanfordCoreNLP object, with POS tagging, lemmatization,
 	// NER, parsing, and coreference resolution

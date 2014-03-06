@@ -54,7 +54,7 @@ public class Splitter extends AbstractStanfordCoreNLPWebService implements
         // steps
         ProcessingStep step = new ProcessingStep();
         // steps metadata
-        step.getMetadata().put(Metadata.PRODUCED_BY, this.getClass().getName() );
+        step.getMetadata().put(Metadata.PRODUCED_BY, this.getClass().getName()  + ":" + Version);
         step.getMetadata().put(Metadata.CONTAINS, Features.PART_OF_SPEECH);
 
 
@@ -74,7 +74,8 @@ public class Splitter extends AbstractStanfordCoreNLPWebService implements
             ann.setLabel(Annotations.SENTENCE);
 
             Map<String, String> features = ann.getFeatures();
-            features.put("sentence", sentence1.toString());
+            putFeature(features, "sentence", sentence1.toString());
+
             step.addAnnotation(ann);
         }
         container.getSteps().add(step);

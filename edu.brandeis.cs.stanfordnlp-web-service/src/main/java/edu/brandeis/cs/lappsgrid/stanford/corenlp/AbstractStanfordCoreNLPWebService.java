@@ -1,5 +1,6 @@
 package edu.brandeis.cs.lappsgrid.stanford.corenlp;
 
+import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,6 +36,8 @@ public abstract class AbstractStanfordCoreNLPWebService implements WebService {
     static protected ConcurrentHashMap<String, StanfordCoreNLP> cache =
             new ConcurrentHashMap<String, StanfordCoreNLP>();
 
+    public static final String Version = "0.0.2";
+
 	public static final String PROP_TOKENIZE = "tokenize";
 	public static final String PROP_SENTENCE_SPLIT = "ssplit";
 	public static final String PROP_POS_TAG = "pos";
@@ -51,6 +54,12 @@ public abstract class AbstractStanfordCoreNLPWebService implements WebService {
 //		this.init("tokenize, ssplit, pos, lemma, ner, parse, dcoref");
 	}
 
+
+    protected static void putFeature(Map mapFeature, String key, Object obj) {
+        if (key != null && obj != null) {
+            mapFeature.put(key, obj.toString());
+        }
+    }
 
     protected void init(String ... tools) {
         props.clear();

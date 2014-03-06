@@ -57,7 +57,7 @@ public class Parser extends AbstractStanfordCoreNLPWebService implements
         // steps
         ProcessingStep step = new ProcessingStep();
         // steps metadata
-        step.getMetadata().put(Metadata.PRODUCED_BY, this.getClass().getName() );
+        step.getMetadata().put(Metadata.PRODUCED_BY, this.getClass().getName()  + ":" + Version);
 
 
         //
@@ -78,8 +78,8 @@ public class Parser extends AbstractStanfordCoreNLPWebService implements
                 ann.setId(id.generate("tok"));
                 ann.setLabel(Annotations.TOKEN);
                 Map<String, String> features = ann.getFeatures();
-                features.put("label", tree.label().value());
-                features.put("tree", sw.toString());
+                putFeature(features, "label", tree.label().value());
+                putFeature(features, "tree", sw.toString());
                 step.addAnnotation(ann);
             }
         }

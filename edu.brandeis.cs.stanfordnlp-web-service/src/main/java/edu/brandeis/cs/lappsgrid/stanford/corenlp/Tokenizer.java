@@ -52,7 +52,7 @@ public class Tokenizer extends AbstractStanfordCoreNLPWebService implements
         // steps
         ProcessingStep step = new ProcessingStep();
         // steps metadata
-        step.getMetadata().put(Metadata.PRODUCED_BY, this.getClass().getName() );
+        step.getMetadata().put(Metadata.PRODUCED_BY, this.getClass().getName() + ":" + Version);
         step.getMetadata().put(Metadata.CONTAINS, Features.PART_OF_SPEECH);
 
         //
@@ -73,14 +73,20 @@ public class Tokenizer extends AbstractStanfordCoreNLPWebService implements
                 ann.setEnd(token.endPosition());
                 ann.setLabel(Annotations.TOKEN);
                 Map<String, String> features = ann.getFeatures();
-                features.put(Features.LEMMA, token.lemma());
-                features.put("word", token.value());
+
+                putFeature(features, Features.LEMMA, token.lemma());
+                putFeature(features, "word", token.value());
+
                 step.addAnnotation(ann);
             }
         }
         container.getSteps().add(step);
         return DataFactory.json(container.toJson());
 	}
+
+
+
+
 
 	@Override
 	public String[] tokenize(String docs) {

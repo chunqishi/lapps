@@ -63,9 +63,8 @@ public class POSTagger extends AbstractStanfordCoreNLPWebService implements
         // steps
         ProcessingStep step = new ProcessingStep();
         // steps metadata
-        step.getMetadata().put(Metadata.PRODUCED_BY, this.getClass().getName() );
+        step.getMetadata().put(Metadata.PRODUCED_BY, this.getClass().getName()  + ":" + Version);
         step.getMetadata().put(Metadata.CONTAINS, Features.PART_OF_SPEECH);
-
 
         //
         IDGenerator id = new IDGenerator();
@@ -86,11 +85,12 @@ public class POSTagger extends AbstractStanfordCoreNLPWebService implements
                 ann.setLabel(Annotations.TOKEN);
 
                 Map<String, String> features = ann.getFeatures();
-                features.put(Features.LEMMA, token.lemma());
-                features.put("category", token.category());
-                features.put(Features.PART_OF_SPEECH, token.get(PartOfSpeechAnnotation.class));
-                features.put("ner", token.ner());
-                features.put("word", token.word());
+                putFeature(features, Features.LEMMA, token.lemma());
+                putFeature(features, "category", token.category());
+                putFeature(features, Features.PART_OF_SPEECH, token.get(PartOfSpeechAnnotation.class));
+                putFeature(features, "ner", token.ner());
+                putFeature(features, "word", token.word());
+
                 step.addAnnotation(ann);
             }
         }
