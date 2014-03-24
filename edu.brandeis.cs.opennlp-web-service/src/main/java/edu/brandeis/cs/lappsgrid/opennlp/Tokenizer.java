@@ -2,15 +2,26 @@ package edu.brandeis.cs.lappsgrid.opennlp;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Properties;
 
+import edu.brandeis.cs.lappsgrid.api.opennlp.IVersion;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
 
+import org.anc.lapps.serialization.Container;
+import org.anc.lapps.serialization.ProcessingStep;
 import org.anc.resource.ResourceLoader;
+import org.anc.util.IDGenerator;
 import org.lappsgrid.api.Data;
+import org.lappsgrid.api.LappsException;
 import org.lappsgrid.core.DataFactory;
+import org.lappsgrid.discriminator.DiscriminatorRegistry;
+import org.lappsgrid.discriminator.Types;
+import org.lappsgrid.vocabulary.Annotations;
+import org.lappsgrid.vocabulary.Features;
+import org.lappsgrid.vocabulary.Metadata;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,14 +36,15 @@ import edu.brandeis.cs.lappsgrid.api.opennlp.ITokenizer;
  * @author Chunqi Shi ( <i>shicq@cs.brandeis.edu</i> )<br>Nov 20, 2013<br>
  * 
  */
-public class Tokenizer implements ITokenizer {
+public class Tokenizer extends AbstractWebService implements ITokenizer {
     protected static final Logger logger = LoggerFactory.getLogger(Tokenizer.class);
     
-    private opennlp.tools.tokenize.Tokenizer tokenizer;
+    private static opennlp.tools.tokenize.Tokenizer tokenizer;
     
     
 	public Tokenizer() throws OpenNLPWebServiceException {
-		init();
+        if (tokenizer == null)
+		    init();
 	}
     
 	protected void init() throws OpenNLPWebServiceException {
@@ -89,22 +101,42 @@ public class Tokenizer implements ITokenizer {
 	public Data execute(Data data) {
 		logger.info("execute(): Execute OpenNLP tokenizer ...");
 
-		if (tokenizer == null) {
-			try {
-				init();
-			} catch (OpenNLPWebServiceException e) {
-				logger.error("execute(): Fail to initialize Tokenizer");
-				return DataFactory
-						.error("execute(): Fail to initialize Tokenizer");
-			}
-		}
+        Container container = null;
+        try {
+            container = getContainer(data);
+        } catch (LappsException e) {
+            return DataFactory.error(e.getMessage());
+        }
 
-		String[] tokens = tokenize(data.getPayload());
+        String[] tokens = tokenize(data.getPayload());
+
+        // steps
+        ProcessingStep step = new ProcessingStep();
+        // steps metadata
+        step.getMetadata().put(Metadata.PRODUCED_BY, this.getClass().getName() + ":" + VERSION);
+        step.getMetadata().put(Metadata.CONTAINS, Features.PART_OF_SPEECH);
+
+        //
+        IDGenerator id = new IDGenerator();
+
+        for (String token: tokens) {
+            org.anc.lapps.serialization.Annotation ann =
+                    new org.anc.lapps.serialization.Annotation();
+            ann.setId(id.generate("tok"));
+            ann.setLabel(Annotations.TOKEN);
+            Map<String, String> features = ann.getFeatures();
+            putFeature(features, Features.WORD, token);
+
+            step.addAnnotation(ann);
+        }
+
 		logger.info("execute(): Execute OpenNLP tokenizer!");
-		return DataFactory.stringList(tokens);
+        container.getSteps().add(step);
+        return DataFactory.json(container.toJson());
 	}
-	
-	@Override
+
+
+    @Override
 	public long[] requires() {
 		return TYPES_REQUIRES;
 	}
@@ -117,26 +149,12 @@ public class Tokenizer implements ITokenizer {
 
 	@Override
 	public String[] tokenize(String s) {
-		if (tokenizer == null) {
-			try {
-				init();
-			} catch (OpenNLPWebServiceException e) {
-				throw new RuntimeException("tokenize(): Fail to initialize Tokenizer", e);
-			}
-		}
 		String tokens[] = tokenizer.tokenize(s);
 		return tokens;
 	}
 
 	@Override
 	public Span[] tokenizePos(String s) {
-		if (tokenizer == null) {
-			try {
-				init();
-			} catch (OpenNLPWebServiceException e) {
-				throw new RuntimeException("tokenize(): Fail to initialize Tokenizer", e);
-			}
-		}
 		Span [] boundaries = tokenizer.tokenizePos(s);
 		return boundaries;
 	}

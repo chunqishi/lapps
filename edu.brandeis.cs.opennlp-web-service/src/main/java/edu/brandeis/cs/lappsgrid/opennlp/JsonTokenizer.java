@@ -1,6 +1,7 @@
 package edu.brandeis.cs.lappsgrid.opennlp;
 
 import edu.brandeis.cs.lappsgrid.api.opennlp.ITokenizer;
+import edu.brandeis.cs.lappsgrid.api.opennlp.IVersion;
 import edu.brandeis.cs.lappsgrid.util.JsonUtil;
 import opennlp.tools.tokenize.TokenizerME;
 import opennlp.tools.tokenize.TokenizerModel;
@@ -32,15 +33,16 @@ import java.util.Properties;
  * @author Chunqi Shi ( <i>shicq@cs.brandeis.edu</i> )<br>Nov 20, 2013<br>
  *
  */
-public class JsonTokenizer implements ITokenizer
+public class JsonTokenizer extends AbstractWebService implements ITokenizer
 {
    protected static final Logger logger = LoggerFactory.getLogger(JsonTokenizer.class);
 
-   private opennlp.tools.tokenize.Tokenizer tokenizer;
+   private static opennlp.tools.tokenize.Tokenizer tokenizer;
 
 
    public JsonTokenizer() throws OpenNLPWebServiceException {
-      init();
+    if (tokenizer == null)
+        init();
    }
 
    protected void init() throws OpenNLPWebServiceException {

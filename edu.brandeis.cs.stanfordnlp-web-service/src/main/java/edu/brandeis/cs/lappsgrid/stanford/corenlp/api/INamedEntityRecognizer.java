@@ -15,8 +15,8 @@ import org.lappsgrid.discriminator.Types;
  */
 public interface INamedEntityRecognizer extends WebService {
 	public static final String PROP_COMPNENT_MODEL = "Name-Finder";
-	public static final long [] TYPES_REQUIRES = new long[] { Types.STANFORD, Types.DOCUMENT  };
-	public static final long [] TYPES_PRODUCES = new long[] { Types.STANFORD, Types.DOCUMENT, Types.NAMED_ENTITES, Types.XML };
+	public static final long [] TYPES_REQUIRES = new long[] { Types.POS };
+	public static final long [] TYPES_PRODUCES = new long[] { Types.STANFORD, Types.NAMED_ENTITES };
 	
 	/**
 	 *  Generates name tags for the given sequence, typically a sentence, returning token spans for any identified names.

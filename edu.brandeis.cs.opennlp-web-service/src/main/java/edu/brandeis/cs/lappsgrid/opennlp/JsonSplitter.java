@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import edu.brandeis.cs.lappsgrid.api.opennlp.IVersion;
 import edu.brandeis.cs.lappsgrid.util.JsonUtil;
 import opennlp.tools.sentdetect.SentenceDetector;
 import opennlp.tools.sentdetect.SentenceDetectorME;
@@ -36,15 +37,16 @@ import org.lappsgrid.vocabulary.*;
  * @author Chunqi Shi ( <i>shicq@cs.brandeis.edu</i> )<br>Nov 20, 2013<br>
  *
  */
-public class JsonSplitter implements ISplitter
+public class JsonSplitter extends AbstractWebService implements ISplitter
 {
    protected static final Logger logger = LoggerFactory.getLogger(JsonSplitter.class);
 
-   private SentenceDetector sentenceDetector;
+   private static SentenceDetector sentenceDetector;
 
 
    public JsonSplitter() throws OpenNLPWebServiceException {
-      init();
+       if (sentenceDetector == null)
+            init();
    }
 
    protected void init() throws OpenNLPWebServiceException {

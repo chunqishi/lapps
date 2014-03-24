@@ -19,7 +19,7 @@ import edu.brandeis.cs.lappsgrid.stanford.corenlp.Splitter;
  * @author Chunqi Shi ( <i>shicq@cs.brandeis.edu</i> )<br>Nov 20, 2013<br>
  * 
  */
-public class TestSplitter extends TestCase {
+public class TestSplitter extends TestService {
 	
 	Splitter splitter;
 	
@@ -30,10 +30,15 @@ public class TestSplitter extends TestCase {
 	@Test
 	public void testSplit() {
 		String [] sents = splitter.split("Hi. How are you? This is Mike.");
-		System.out.println(Arrays.toString(sents));
+//		System.out.println(Arrays.toString(sents));
 		String [] goldSents = {"Hi.","How are you?","This is Mike."};
 		Assert.assertArrayEquals("Splitter Failure.", goldSents, sents);
 	}
-	
 
+
+    @Test
+    public void testExecute(){
+        ret = splitter.execute(data);
+        Assert.assertTrue(ret.getPayload().contains("by return email or by telephone"));
+    }
 }
