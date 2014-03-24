@@ -21,7 +21,7 @@ public interface INamedEntityRecognizer extends WebService {
 	/**
 	 *  Generates name tags for the given sequence, typically a sentence, returning token spans for any identified names.
 	 * 
-	 * @see opennlp.tools.namefind.TokenNameFinder
+	 * @see{opennlp.tools.namefind.TokenNameFinder}
 	 */
 	public String find(String docs) ;
 }

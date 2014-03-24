@@ -5,7 +5,7 @@
 		<version>1.5.3</version> </parent -->
 	<groupId>edu.brandeis.cs.lapps</groupId>
 	<artifactId>opennlp-web-service</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.2</version>
 	<packaging>war</packaging>
 	<name>Web Services wrapping opennlp</name>
 	<description>
@@ -117,6 +117,36 @@
 	<build>
 		<finalName>opennlp-web-service#${project.version}</finalName>
 		<plugins>
+            
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass></mainClass>
+                        </manifest>
+                    </archive>
+                    <descriptorRefs>
+                        <descriptorRef>jar-with-dependencies</descriptorRef>
+                    </descriptorRefs>
+                </configuration>
+            </plugin>
+            
+             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-release-plugin</artifactId>
+                <version>2.4.2</version>
+                <configuration>
+                    <tagBase>http://eldrad.cs-i.brandeis.edu:6061/nexus/content/repositories/releases/</tagBase>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.4</version>
+            </plugin>
+            
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>2.3.2</version>
