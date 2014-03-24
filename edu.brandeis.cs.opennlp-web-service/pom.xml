@@ -5,11 +5,7 @@
 		<version>1.5.3</version> </parent -->
 	<groupId>edu.brandeis.cs.lapps</groupId>
 	<artifactId>opennlp-web-service</artifactId>
-<<<<<<< HEAD
-	<version>0.0.2</version>
-=======
 	<version>0.0.3-SNAPSHOT</version>
->>>>>>> 275422861c7d57be19f28c9017cb196a4e364359
 	<packaging>war</packaging>
 	<name>Web Services wrapping opennlp</name>
 	<description>
@@ -71,7 +67,7 @@
 		<dependency>
 			<groupId>org.anc.lapps</groupId>
 			<artifactId>serialization</artifactId>
-			<version>0.10.0</version>
+			<version>0.12.0</version>
 		</dependency>
         <dependency>
             <groupId>org.lappsgrid</groupId>
