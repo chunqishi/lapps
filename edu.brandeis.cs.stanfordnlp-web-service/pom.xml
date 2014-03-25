@@ -13,7 +13,7 @@
 
 	<properties>
 		<lapps.version>1.0.1</lapps.version>
-		<lapps.core.version>1.0.2</lapps.core.version>
+		<lapps.core.version>1.1.0</lapps.core.version>
 		<vocabulary.version>0.9.3</vocabulary.version>
         <stanford.version>3.3.1</stanford.version>
 	</properties>
