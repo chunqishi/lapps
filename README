@@ -4,3 +4,13 @@
 #
 #  
 ## settings.xml is required for private maven library.
+
+
+
+!!! This repository is deprecated.
+Please referer to 
+
+1. https://github.com/chunqishi/edu.brandeis.cs.opennlp-web-service
+2. https://github.com/chunqishi/edu.brandeis.cs.stanford-web-service
+3. https://github.com/chunqishi/edu.brandeis.cs.template-web-service
+4. https://github.com/chunqishi/edu.brandeis.cs.nltk-web-service
